@@ -1,0 +1,291 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { usePatientAuth } from "@/contexts/PatientAuthContext";
+
+export function Header() {
+  const [deptOpen, setDeptOpen] = useState(false);
+  const [apptOpen, setApptOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const apptRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { patient, login, logout } = usePatientAuth();
+  const pathname = usePathname();
+
+  // Close appointment dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (apptRef.current && !apptRef.current.contains(e.target as Node)) {
+        setApptOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const openLoginModal = () => {
+    setLoginError("");
+    setLoginOpen(true);
+  };
+
+  const goToPortal = (section?: "book" | "history") => {
+    setApptOpen(false);
+    const search = section ? `?section=${section}` : "";
+    router.push(`/patient-portal${search}`);
+  };
+
+  const handleProtectedPortalNavigation = (section: "book" | "history") => {
+    if (patient) {
+      goToPortal(section);
+      return;
+    }
+    setApptOpen(false);
+    openLoginModal();
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setLoginLoading(true);
+    try {
+      const res = await fetch("/api/patients/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setLoginError(data.message ?? "Login failed. Check your credentials.");
+        return;
+      }
+      login(data.access_token, data.patient);
+      setLoginOpen(false);
+      setLoginEmail("");
+      setLoginPassword("");
+      router.push("/patient-portal");
+    } catch {
+      setLoginError("Network error. Please try again.");
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setLoginOpen(false);
+    setLoginEmail("");
+    setLoginPassword("");
+  };
+
+  const deptLinks = [
+    { href: "/departments#administrative", label: "Administrative Departments" },
+    { href: "/departments#outpatient", label: "Outpatient Department" },
+    { href: "/departments#theatre", label: "Theatre Department" },
+    { href: "/departments#inpatient", label: "Inpatient Departments" },
+    { href: "/departments#anesthesia", label: "Anesthesia Department" },
+    { href: "/departments#surgical", label: "Surgical Departments" },
+    { href: "/departments#diagnostics", label: "Lab and Diagnostic Departments" },
+    { href: "/departments#phlebotomy", label: "Phlebotomy" },
+    { href: "/departments#pharmacology", label: "Pharmacology Departments" },
+  ];
+
+  const isActive = (path: string) => {
+    return pathname === path || pathname.startsWith(path + "/");
+  };
+
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/services", label: "Services" },
+    { href: "/doctors", label: "Doctors" },
+    { href: "/contact", label: "Contact" },
+    { href: "/blog", label: "Blog" },
+  ];
+
+  const departmentsActive = isActive("/departments");
+
+  return (
+    <>
+    <header className="sticky top-0 z-30 border-b border-black/10 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link href="/" className="font-[cursive] text-2xl font-bold text-black">
+          <Image src="/logo.png" alt="Logo" width={90} height={40} />
+        </Link>
+
+        {/* Nav */}
+        <nav className="hidden items-center gap-7 text-sm font-medium md:flex">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={isActive(item.href) ? "border-b-2 border-primary pb-0.5 font-semibold text-primary" : "hover:text-primary"}
+            >
+              {item.label}
+            </Link>
+          ))}
+
+          {/* Departments dropdown */}
+          <div className="relative">
+            <div className="flex items-center gap-1">
+              <Link
+                href="/departments"
+                className={departmentsActive ? "border-b-2 border-primary pb-0.5 font-semibold text-primary" : "hover:text-primary"}
+              >
+                Departments
+              </Link>
+              <button
+                onClick={() => setDeptOpen((o) => !o)}
+                aria-label="Open departments menu"
+                className={departmentsActive ? "text-primary" : "hover:text-primary"}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+            {deptOpen && (
+              <div className="absolute left-0 top-full mt-2 w-64 rounded-md border border-black/10 bg-white py-2 shadow-lg">
+                {deptLinks.map((item) => (
+                  <Link key={item.href} href={item.href} className="block px-4 py-2 text-sm hover:bg-gray-50">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* CTA buttons */}
+        <div className="hidden items-center gap-3 md:flex">
+          {/* Appointment dropdown */}
+          <div className="relative" ref={apptRef}>
+            <button
+              onClick={() => setApptOpen((o) => !o)}
+              className="flex items-center gap-1.5 rounded-full border border-indigo-200 bg-white px-5 py-2 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50"
+            >
+              Appointment
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {apptOpen && (
+              <div className="absolute right-0 top-full mt-2 w-52 rounded-md border border-black/10 bg-white py-1 shadow-lg">
+                <Link
+                  href={patient ? "/patient-portal?section=book" : "#"}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    handleProtectedPortalNavigation("book");
+                  }}
+                  className="block px-4 py-2.5 text-sm font-medium hover:bg-indigo-50 hover:text-indigo-700"
+                >
+                  Book Appointment
+                </Link>
+                <Link
+                  href={patient ? "/patient-portal?section=history" : "#"}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    handleProtectedPortalNavigation("history");
+                  }}
+                  className="block px-4 py-2.5 text-sm font-medium hover:bg-indigo-50 hover:text-indigo-700"
+                >
+                  Appointment History
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Login button */}
+          <button
+            onClick={() => {
+              if (patient) {
+                goToPortal();
+                return;
+              }
+              openLoginModal();
+            }}
+            className="rounded-full bg-[#1a1aaa] px-5 py-2 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
+          >
+            {patient ? patient.name.split(" ")[0] : "Login"}
+          </button>
+        </div>
+      </div>
+
+    </header>
+
+      {/* Login / Patient Portal Modal — rendered outside <header> to avoid stacking context clipping */}
+      {loginOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { if (e.target === e.currentTarget) setLoginOpen(false); }}>
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+            {/* Modal header */}
+            <div className="flex items-center justify-between border-b px-6 py-4">
+              <h2 className="text-lg font-bold text-gray-900">Patient Portal</h2>
+              <button onClick={() => setLoginOpen(false)} className="rounded-full p-1 hover:bg-gray-100" aria-label="Close">
+                <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="px-6 py-5">
+              <p className="mb-5 text-sm text-gray-500">Sign in to access your patient portal, review your appointment history, and continue booking.</p>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Email address</label>
+                  <input
+                    type="email"
+                    required
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+                {loginError && (
+                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{loginError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="w-full rounded-lg bg-[#1a1aaa] py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-800 disabled:opacity-60"
+                >
+                  {loginLoading ? "Signing in..." : "Sign In"}
+                </button>
+              </form>
+              <p className="mt-5 text-center text-sm text-gray-500">
+                Don&apos;t have an account?{" "}
+                <Link href="/register" onClick={() => setLoginOpen(false)} className="font-semibold text-indigo-700 hover:underline">
+                  Register / Create Account
+                </Link>
+              </p>
+              {patient && (
+                <div className="mt-4 border-t pt-4">
+                  <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:underline">
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
