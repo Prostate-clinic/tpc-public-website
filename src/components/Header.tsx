@@ -8,6 +8,9 @@ import { usePatientAuth } from "@/contexts/PatientAuthContext";
 export function Header() {
   const [deptOpen, setDeptOpen] = useState(false);
   const [apptOpen, setApptOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileDeptOpen, setMobileDeptOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -27,6 +30,23 @@ export function Header() {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setDeptOpen(false);
+    setMobileDeptOpen(false);
+    setApptOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const openLoginModal = () => {
@@ -112,7 +132,11 @@ export function Header() {
 
   return (
     <>
-    <header className="sticky top-0 z-30 border-b border-black/10 bg-white/90 backdrop-blur">
+    <header
+      className={isScrolled
+        ? "sticky top-2 z-30 mx-3 rounded-full border border-black/10 bg-white/95 shadow-lg backdrop-blur transition-all duration-300 md:top-0 md:mx-0 md:rounded-none md:border-x-0 md:border-t-0 md:shadow-none md:overflow-visible"
+        : "sticky top-0 z-30 border-b border-black/10 bg-white/90 backdrop-blur transition-all duration-300 md:overflow-visible"}
+    >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="font-[cursive] text-2xl font-bold text-black">
@@ -150,15 +174,18 @@ export function Header() {
                 </svg>
               </button>
             </div>
-            {deptOpen && (
-              <div className="absolute left-0 top-full mt-2 w-64 rounded-md border border-black/10 bg-white py-2 shadow-lg">
+            <div
+              aria-hidden={!deptOpen}
+              className={deptOpen
+                ? "absolute left-0 top-full z-20 mt-2 w-64 translate-y-0 rounded-md border border-black/10 bg-white py-2 opacity-100 shadow-lg transition-all duration-200 ease-out"
+                : "pointer-events-none absolute left-0 top-full z-20 mt-2 w-64 -translate-y-1 rounded-md border border-black/10 bg-white py-2 opacity-0 shadow-lg transition-all duration-200 ease-in"}
+            >
                 {deptLinks.map((item) => (
                   <Link key={item.href} href={item.href} className="block px-4 py-2 text-sm hover:bg-gray-50">
                     {item.label}
                   </Link>
                 ))}
               </div>
-            )}
           </div>
         </nav>
 
@@ -175,8 +202,12 @@ export function Header() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            {apptOpen && (
-              <div className="absolute right-0 top-full mt-2 w-52 rounded-md border border-black/10 bg-white py-1 shadow-lg">
+            <div
+              aria-hidden={!apptOpen}
+              className={apptOpen
+                ? "absolute right-0 top-full z-20 mt-2 w-52 translate-y-0 rounded-md border border-black/10 bg-white py-1 opacity-100 shadow-lg transition-all duration-200 ease-out"
+                : "pointer-events-none absolute right-0 top-full z-20 mt-2 w-52 -translate-y-1 rounded-md border border-black/10 bg-white py-1 opacity-0 shadow-lg transition-all duration-200 ease-in"}
+            >
                 <Link
                   href={patient ? "/patient-portal?section=book" : "#"}
                   onClick={(event) => {
@@ -198,7 +229,6 @@ export function Header() {
                   Appointment History
                 </Link>
               </div>
-            )}
           </div>
 
           {/* Login button */}
@@ -215,9 +245,124 @@ export function Header() {
             {patient ? patient.name.split(" ")[0] : "Login"}
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-700 md:hidden"
+          aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? (
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
 
     </header>
+
+    <div className={mobileOpen ? "fixed inset-0 z-40 md:hidden" : "pointer-events-none fixed inset-0 z-40 md:hidden"}>
+      <button
+        type="button"
+        aria-label="Close mobile menu"
+        onClick={() => setMobileOpen(false)}
+        className={mobileOpen ? "absolute inset-0 bg-black/35 opacity-100 transition-opacity duration-300" : "absolute inset-0 bg-black/35 opacity-0 transition-opacity duration-300"}
+      />
+
+      <aside
+        aria-hidden={!mobileOpen}
+        className={mobileOpen
+          ? "absolute right-0 top-0 h-full w-[86%] max-w-sm translate-x-0 overflow-y-auto border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-out"
+          : "absolute right-0 top-0 h-full w-[86%] max-w-sm translate-x-full overflow-y-auto border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-in"}
+      >
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <Link href="/" onClick={() => setMobileOpen(false)}>
+            <Image src="/logo.png" alt="Logo" width={90} height={40} />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setMobileOpen(false)}
+            className="rounded-lg border border-slate-300 p-2 text-slate-700"
+            aria-label="Close menu"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="px-4 py-4">
+          <nav className="space-y-1 text-sm font-medium">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={isActive(item.href) ? "block rounded-md bg-indigo-50 px-3 py-2 font-semibold text-primary" : "block rounded-md px-3 py-2 hover:bg-slate-50"}
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => setMobileDeptOpen((open) => !open)}
+              className={departmentsActive ? "flex w-full items-center justify-between rounded-md bg-indigo-50 px-3 py-2 font-semibold text-primary" : "flex w-full items-center justify-between rounded-md px-3 py-2 hover:bg-slate-50"}
+            >
+              <span>Departments</span>
+              <svg className={mobileDeptOpen ? "h-4 w-4 rotate-180 transition" : "h-4 w-4 transition"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div
+              aria-hidden={!mobileDeptOpen}
+              className={mobileDeptOpen
+                ? "mt-1 max-h-80 space-y-1 overflow-hidden rounded-md border border-slate-200 bg-slate-50 p-2 opacity-100 transition-all duration-250 ease-out"
+                : "mt-1 max-h-0 space-y-1 overflow-hidden rounded-md border border-slate-200 bg-slate-50 p-0 opacity-0 transition-all duration-250 ease-in"}
+            >
+              {deptLinks.map((item) => (
+                <Link key={item.href} href={item.href} className="block rounded px-2 py-1.5 text-sm hover:bg-white">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          <div className="mt-4 space-y-2 border-t border-slate-200 pt-4">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileOpen(false);
+                handleProtectedPortalNavigation("book");
+              }}
+              className="w-full rounded-full border border-indigo-200 bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700"
+            >
+              Book Appointment
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileOpen(false);
+                if (patient) {
+                  goToPortal();
+                  return;
+                }
+                openLoginModal();
+              }}
+              className="w-full rounded-full bg-[#1a1aaa] px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              {patient ? "Go to Portal" : "Login"}
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
 
       {/* Login / Patient Portal Modal — rendered outside <header> to avoid stacking context clipping */}
       {loginOpen && (

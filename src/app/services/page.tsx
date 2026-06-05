@@ -165,15 +165,15 @@ export default function Services() {
           </p>
 
           <div className="mt-12 grid gap-10 lg:grid-cols-[280px_1fr]">
-            <aside className="lg:sticky lg:top-24 lg:self-start">
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+              <div className="w-full max-w-full overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                 <p className="mb-5 text-xl font-semibold">Our Services</p>
-                <div className="space-y-3">
+                <div className="flex w-full max-w-full snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-1 lg:block lg:overflow-visible lg:pb-0">
                   {serviceCategories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setActiveCategory(category.id)}
-                      className={`w-full rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition ${activeCategory === category.id
+                      className={`w-auto shrink-0 snap-start whitespace-nowrap rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition lg:mb-3 lg:w-full lg:whitespace-normal ${activeCategory === category.id
                           ? "border-indigo-200 bg-indigo-50 text-indigo-900"
                           : "border-slate-200 bg-white text-slate-700 hover:border-indigo-100 hover:bg-indigo-50/60"
                         }`}
