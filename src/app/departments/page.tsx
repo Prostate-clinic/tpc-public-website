@@ -34,7 +34,7 @@ export default function DepartmentsPage() {
           description:
             "The backbone of our clinical operations, managing workflow, governance, and strategic service delivery.",
           icon: "AD",
-          image:"/"
+          image:"/departments/admin.png"
         },
         {
           id: "patient-coordination",
@@ -42,7 +42,7 @@ export default function DepartmentsPage() {
           description:
             "A dedicated concierge service guiding every patient through assessment, treatment, and long-term follow-up.",
           icon: "PC",
-          image: "/"
+          image: "/departments/patientGuidance.png"
         },
       ],
     },
@@ -56,7 +56,7 @@ export default function DepartmentsPage() {
           description:
             "Efficient consultations and fast-track diagnostics for ambulatory patients requiring specialist review.",
           icon: "OP",
-          image: "/"
+          image: "/departments/outpatient.png"
         },
         {
           id: "inpatient",
@@ -64,7 +64,7 @@ export default function DepartmentsPage() {
           description:
             "Premium recovery suites with 24/7 monitoring and personalized post-intervention clinical protocols.",
           icon: "IP",
-          image: "/"
+          image: "/departments/inpatient.png"
         },
       ],
     },
@@ -78,7 +78,7 @@ export default function DepartmentsPage() {
           description:
             "Next-generation profiling and AI-assisted imaging designed for early detection and clearer decisions.",
           icon: "LD",
-          image: "/"
+          image: "/Advanced-diagnostics.jpg"
         },
         {
           id: "phlebotomy",
@@ -86,7 +86,7 @@ export default function DepartmentsPage() {
           description:
             "Advanced sampling and blood analysis workflows supporting oncology and precision-urology pathways.",
           icon: "PH",
-          image: "/"
+          image: "/departments/phlebotomy.png"
         },
       ],
     },
@@ -100,7 +100,7 @@ export default function DepartmentsPage() {
           description:
             "Robotics-enabled operating protocols built for procedural precision and patient safety from start to finish.",
           icon: "SG",
-          image: "/"
+          image: "/robotic2.jpg"
         },
         {
           id: "anesthesia",
@@ -108,7 +108,7 @@ export default function DepartmentsPage() {
           description:
             "Structured anesthesia management with tailored plans, intra-operative monitoring, and recovery support.",
           icon: "AN",
-          image: "/"
+          image: "/departments/anaesthesia.png"
         },
         {
           id: "theatre",
@@ -116,7 +116,7 @@ export default function DepartmentsPage() {
           description:
             "State-of-the-art theatre infrastructure engineered for sterile workflow, precision instrumentation, and efficiency.",
           icon: "TH",
-          image: "/"
+          image: "/departments/theatre.png"
         },
       ],
     },
@@ -131,7 +131,7 @@ export default function DepartmentsPage() {
             "Expert medication management and targeted therapy planning aligned to each patient profile and treatment phase.",
           icon: "RX",
           full: true,
-          image: "/"
+          image: "/departments/pharmacology.png"
         },
       ],
     },
@@ -210,7 +210,7 @@ export default function DepartmentsPage() {
                       }`}
                     >
                       <div className="relative mb-2 h-[50vmin] overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
-                        <Image src={PLACEHOLDER_SRC} alt={card.title} fill className="object-cover" />
+                        <Image src={card.image} alt={card.title} fill className="object-cover" />
                         <div className="absolute inset-0 bg-slate-900/10" />
                       </div>
                       <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-xs font-extrabold text-indigo-700">
@@ -218,9 +218,9 @@ export default function DepartmentsPage() {
                       </div>
                       <h4 className="mt-4 text-xl font-bold text-slate-900">{card.title}</h4>
                       <p className="mt-2 max-w-xl text-sm leading-7 text-slate-600">{card.description}</p>
-                      <button className="mt-4 rounded-full bg-[#1a1aaa] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#111188]">
+                      {/* <button className="mt-4 rounded-full bg-[#1a1aaa] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#111188]">
                         Learn More
-                      </button>
+                      </button> */}
                     </article>
                   ))}
                 </div>
