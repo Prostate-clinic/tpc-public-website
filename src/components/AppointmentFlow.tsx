@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, Check, ClipboardCheck, FileText, Stethoscope, UserRound } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { usePatientAuth } from "@/contexts/PatientAuthContext";
 
 type Step = {
     id: number;
@@ -119,7 +118,6 @@ function getStepStatus(stepId: number, currentStep: number) {
 }
 
 export function AppointmentFlow() {
-    const { patient, token } = usePatientAuth();
     const [currentStep, setCurrentStep] = useState(1);
     const [selectedService, setSelectedService] = useState<ServiceOption | null>(null);
     const [selectedDoctor, setSelectedDoctor] = useState<DoctorOption | null>(null);
@@ -151,26 +149,20 @@ export function AppointmentFlow() {
     const filteredServices = useMemo(() => {
         if (activeServiceCategory === "all") return services;
         return services.filter((service) => service.category === activeServiceCategory);
-    }, [activeServiceCategory]);
-
-    const effectiveFullName = patient?.name ?? fullName;
-    const effectiveEmail = patient?.email ?? email;
-    const patientIdentityMismatch = Boolean(
-        patient && ((fullName && fullName !== patient.name) || (email && email !== patient.email)),
-    );
+    }, [activeServiceCategory, services]);
 
     const canContinue = useMemo(() => {
         if (currentStep === 1) return Boolean(selectedService);
         if (currentStep === 2) return Boolean(selectedDoctor);
         if (currentStep === 3) return Boolean(selectedSlot);
         if (currentStep === 4) {
-            return !patientIdentityMismatch && effectiveFullName.trim().length > 2 && effectiveEmail.includes("@") && phone.trim().length > 7;
+            return fullName.trim().length > 2 && email.includes("@") && phone.trim().length > 7;
         }
         if (currentStep === 5) return true;
         return false;
-    }, [currentStep, selectedService, selectedDoctor, selectedSlot, effectiveFullName, effectiveEmail, phone, patientIdentityMismatch]);
+    }, [currentStep, selectedService, selectedDoctor, selectedSlot, fullName, email, phone]);
 
-    const allReady = Boolean(selectedService && selectedDoctor && selectedSlot && effectiveFullName && effectiveEmail && phone && !patientIdentityMismatch);
+    const allReady = Boolean(selectedService && selectedDoctor && selectedSlot && fullName && email && phone);
 
     useEffect(() => {
         const today = new Date().toISOString().split("T")[0];
@@ -309,14 +301,6 @@ export function AppointmentFlow() {
         }
     }, [doctors, selectedDoctor]);
 
-    useEffect(() => {
-        if (!patient) return;
-
-        setFullName(patient.name || "");
-        setEmail(patient.email || "");
-        setPhone(patient.phone || "");
-    }, [patient]);
-
     const moveNext = () => {
         if (!canContinue || currentStep >= 5) return;
         setCurrentStep((prev) => prev + 1);
@@ -332,15 +316,10 @@ export function AppointmentFlow() {
         setIsSubmitting(true);
         setSubmitError("");
         try {
-            if (patientIdentityMismatch) {
-                throw new Error("Full name and email must match your patient profile.");
-            }
-
             const res = await fetch("/api/appointments", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
                 body: JSON.stringify({
                     serviceId: selectedService!.id,
@@ -349,8 +328,8 @@ export function AppointmentFlow() {
                     startTime: selectedSlot!.startTime,
                     endTime: selectedSlot!.endTime,
                     slotId: null,
-                    fullName: effectiveFullName,
-                    email: effectiveEmail,
+                    fullName,
+                    email,
                     phone,
                     notes,
                 }),
@@ -687,27 +666,23 @@ export function AppointmentFlow() {
                                     <label className="grid gap-1 text-sm">
                                         <span className="font-semibold text-slate-700">Full Name</span>
                                         <input
-                                            value={effectiveFullName}
+                                            value={fullName}
                                             onChange={(event) => setFullName(event.target.value)}
                                             type="text"
-                                            readOnly={Boolean(patient)}
-                                            className={`h-11 rounded-xl border px-3 outline-none ring-indigo-300 focus:ring ${patient ? "border-slate-200 bg-slate-100 text-slate-500" : "border-slate-300 bg-white"}`}
+                                            className="h-11 rounded-xl border border-slate-300 bg-white px-3 outline-none ring-indigo-300 focus:ring"
                                             placeholder="Enter full name"
                                         />
-                                        {patient && <span className="text-xs text-slate-500">Pulled from your patient profile.</span>}
                                     </label>
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <label className="grid gap-1 text-sm">
                                             <span className="font-semibold text-slate-700">Email</span>
                                             <input
-                                                value={effectiveEmail}
+                                                value={email}
                                                 onChange={(event) => setEmail(event.target.value)}
                                                 type="email"
-                                                readOnly={Boolean(patient)}
-                                                className={`h-11 rounded-xl border px-3 outline-none ring-indigo-300 focus:ring ${patient ? "border-slate-200 bg-slate-100 text-slate-500" : "border-slate-300 bg-white"}`}
+                                                className="h-11 rounded-xl border border-slate-300 bg-white px-3 outline-none ring-indigo-300 focus:ring"
                                                 placeholder="name@email.com"
                                             />
-                                            {patient && <span className="text-xs text-slate-500">Pulled from your patient profile.</span>}
                                         </label>
                                         <label className="grid gap-1 text-sm">
                                             <span className="font-semibold text-slate-700">Phone</span>
@@ -715,18 +690,11 @@ export function AppointmentFlow() {
                                                 value={phone}
                                                 onChange={(event) => setPhone(event.target.value)}
                                                 type="tel"
-                                                readOnly={Boolean(patient)}
-                                                className={`h-11 rounded-xl border px-3 outline-none ring-indigo-300 focus:ring ${patient ? "border-slate-200 bg-slate-100 text-slate-500" : "border-slate-300 bg-white"}`}
+                                                className="h-11 rounded-xl border border-slate-300 bg-white px-3 outline-none ring-indigo-300 focus:ring"
                                                 placeholder="0800 000 0000"
                                             />
-                                            {patient && <span className="text-xs text-slate-500">Pulled from your patient profile.</span>}
                                         </label>
                                     </div>
-                                    {patientIdentityMismatch && (
-                                        <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                                            Full name and email must match your patient profile.
-                                        </div>
-                                    )}
                                     <label className="grid gap-1 text-sm">
                                         <span className="font-semibold text-slate-700">Clinical Notes (Optional)</span>
                                         <textarea
@@ -757,8 +725,8 @@ export function AppointmentFlow() {
                                     </div>
                                     <div className="rounded-xl bg-slate-50 p-3">
                                         <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Patient</p>
-                                        <p className="mt-1 text-sm text-slate-800">{effectiveFullName || "Not added"}</p>
-                                        <p className="text-xs text-slate-500">{effectiveEmail || "No email"}</p>
+                                        <p className="mt-1 text-sm text-slate-800">{fullName || "Not added"}</p>
+                                        <p className="text-xs text-slate-500">{email || "No email"}</p>
                                     </div>
 
                                     {submitError && (

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
 import { RecoveryCta } from "@/components/RecoveryCta";
@@ -120,9 +121,9 @@ export default function DoctorsPage() {
                 Meet the clinicians, surgeons, and care teams delivering advanced urologic treatment through collaborative,
                 evidence-led care tailored to every patient journey.
             </p>
-            <button className="mt-8 rounded-full bg-[#1a1aaa] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:-translate-y-0.5 hover:bg-[#111188]">
+            <Link href="/appointment" className="mt-8 inline-block rounded-full bg-[#1a1aaa] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:-translate-y-0.5 hover:bg-[#111188]">
               Book Appointment
-            </button>
+            </Link>
           </div>
         </section>
 

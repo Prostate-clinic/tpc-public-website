@@ -4,8 +4,73 @@ import { Header } from "@/components/Header";
 import { useRef, useState, useEffect } from "react";
 import { GlobalFooter } from "@/components/GlobalFooter";
 import { RecoveryCta } from "@/components/RecoveryCta";
+import Link from "next/link";
 
 const PLACEHOLDER_SRC = "/No-Image-Placeholder%20(2).svg";
+
+type ApiBlog = {
+    id: string;
+    title: string;
+    excerpt?: string | null;
+    content?: string | null;
+    coverImage?: string | null;
+    tags?: string[] | null;
+};
+
+type InsightCard = {
+    id: string;
+    category: string;
+    title: string;
+    description: string;
+    img?: string;
+};
+
+const fallbackInsights: InsightCard[] = [
+    {
+        id: "insight-1",
+        category: "Health Insights",
+        title: "Prostate Health Essentials",
+        description:
+            "A practical walkthrough of screening windows, symptom patterns, and when to escalate for specialist review.",
+        img: "/prostate-health.jpg",
+    },
+    {
+        id: "insight-2",
+        category: "Clinical Innovation",
+        title: "Transforming Care Through Robotics",
+        description:
+            "How precision robotics and multidisciplinary planning can lower variability and improve confidence in outcomes.",
+    },
+    {
+        id: "insight-3",
+        category: "Recovery Guide",
+        title: "Nutrition, Hydration, and Recovery",
+        description:
+            "Simple daily habits that help patients improve healing, recovery response, and long-term treatment resilience.",
+    },
+];
+
+function normalizeBlogImage(image?: string | null) {
+    if (!image) return PLACEHOLDER_SRC;
+    if (image.startsWith("http://") || image.startsWith("https://")) return image;
+    if (image.startsWith("/")) return image;
+    return `/${image}`;
+}
+
+function toInsightCards(blogs: ApiBlog[]): InsightCard[] {
+    return blogs.map((blog, index) => {
+        const fullText = blog.excerpt || blog.content || "";
+        const trimmedText = fullText.length > 140 ? `${fullText.slice(0, 137)}...` : fullText;
+
+        return {
+            id: blog.id || `insight-${index}`,
+            category: blog.tags?.[0] || "Health Insights",
+            title: blog.title || "Untitled article",
+            description: trimmedText || "Read the latest update from our specialist care team.",
+            img: normalizeBlogImage(blog.coverImage),
+        };
+    });
+}
 
 export default function About() {
     const teamMembers = [
@@ -47,37 +112,12 @@ export default function About() {
         },
     ];
 
-    const insights = [
-        {
-            id: "insight-1",
-            category: "Health Insights",
-            title: "Prostate Health Essentials",
-            description:
-                "A practical walkthrough of screening windows, symptom patterns, and when to escalate for specialist review.",
-            tone: "from-slate-100 via-cyan-50 to-blue-100",
-            img:"/prostate-health.jpg",
-        },
-        {
-            id: "insight-2",
-            category: "Clinical Innovation",
-            title: "Transforming Care Through Robotics",
-            description:
-                "How precision robotics and multidisciplinary planning can lower variability and improve confidence in outcomes.",
-            tone: "from-slate-100 via-violet-50 to-indigo-100",
-        },
-        {
-            id: "insight-3",
-            category: "Recovery Guide",
-            title: "Nutrition, Hydration, and Recovery",
-            description:
-                "Simple daily habits that help patients improve healing, recovery response, and long-term treatment resilience.",
-            tone: "from-slate-100 via-emerald-50 to-teal-100",
-        },
-    ];
-
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [scrollProgress, setScrollProgress] = useState(0);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [insights, setInsights] = useState<InsightCard[]>(fallbackInsights);
+    const [insightsLoading, setInsightsLoading] = useState(true);
+    const [insightsError, setInsightsError] = useState("");
 
     useEffect(() => {
         const container = scrollContainerRef.current;
@@ -102,6 +142,50 @@ export default function About() {
         return () => container.removeEventListener("scroll", handleScroll);
     }, [teamMembers.length]);
 
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadInsights = async () => {
+            setInsightsLoading(true);
+            setInsightsError("");
+
+            try {
+                const response = await fetch("/api/blogs?page=1&limit=3", { cache: "no-store" });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data?.message || "Unable to load education updates right now.");
+                }
+
+                const records: ApiBlog[] = Array.isArray(data?.blogs)
+                    ? data.blogs
+                    : Array.isArray(data)
+                      ? data
+                      : [];
+                const mapped = toInsightCards(records);
+
+                if (isMounted) {
+                    setInsights(mapped.length > 0 ? mapped : fallbackInsights);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setInsightsError(error instanceof Error ? error.message : "Unable to load education updates right now.");
+                    setInsights(fallbackInsights);
+                }
+            } finally {
+                if (isMounted) {
+                    setInsightsLoading(false);
+                }
+            }
+        };
+
+        loadInsights();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     return (
         <div className="bg-slate-50 text-slate-900">
             <Header />
@@ -122,17 +206,17 @@ export default function About() {
                             consistent outcomes for every patient journey.
                         </p>
                         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                            <button className="rounded-full bg-[#1a1aaa] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:-translate-y-0.5 hover:bg-[#111188]">
+                            <Link href="/appointment" className="rounded-full bg-[#1a1aaa] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:-translate-y-0.5 hover:bg-[#111188]">
                                 Book Appointment
-                            </button>
-                            <button className="rounded-full border border-white/40 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                            </Link>
+                            <Link href="#who-we-are" className="rounded-full border border-white/40 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
                                 Learn More
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </section>
 
-                <section className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
+                <section id="who-we-are" className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
                     <div className="text-center">
                         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-700">Who We Are</p>
                         <h2 className="mt-3 text-4xl font-bold">Clinical Excellence, Intentionally Delivered</h2>
@@ -304,7 +388,29 @@ export default function About() {
                         <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-600">Stay informed with practical updates from our care team.</p>
                     </div>
 
+                    {insightsError && (
+                        <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                            {insightsError}
+                        </div>
+                    )}
+
                     <div className="mt-12 grid gap-6 md:grid-cols-3">
+                        {insightsLoading &&
+                            Array.from({ length: 3 }).map((_, index) => (
+                                <article
+                                    key={`insight-skeleton-${index}`}
+                                    className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+                                >
+                                    <div className="h-44 animate-pulse bg-slate-200" />
+                                    <div className="space-y-3 p-6">
+                                        <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
+                                        <div className="h-6 w-full animate-pulse rounded bg-slate-200" />
+                                        <div className="h-4 w-11/12 animate-pulse rounded bg-slate-200" />
+                                        <div className="h-4 w-4/5 animate-pulse rounded bg-slate-200" />
+                                    </div>
+                                </article>
+                            ))}
+
                         {insights.map((item) => (
                             <article
                                 key={item.id}
@@ -318,9 +424,9 @@ export default function About() {
                                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{item.category}</p>
                                     <h3 className="mt-3 text-xl font-extrabold text-slate-900">{item.title}</h3>
                                     <p className="mt-3 text-sm leading-7 text-slate-600">{item.description}</p>
-                                    <button className="mt-5 rounded-full border border-indigo-200 px-5 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50">
+                                    <Link href={`/blog/${item.id}`} className="mt-5 inline-block rounded-full border border-indigo-200 px-5 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50">
                                         Read More
-                                    </button>
+                                    </Link>
                                 </div>
                             </article>
                         ))}

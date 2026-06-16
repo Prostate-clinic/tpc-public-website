@@ -85,7 +85,7 @@ export default async function Home() {
               </p>
               <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <a
-                  href="/contact"
+                  href="/appointment"
                   className="rounded-full bg-[#1a1aaa] px-8 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#111188]"
                 >
                   Book Appointment
@@ -149,11 +149,11 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="services" className="mx-auto w-full max-w-5xl px-5 py-14 sm:px-6 lg:px-8">
+        <section id="services" className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl">Explore Our Services</h2>
           <p className="text-center text-[11px] mt-3 font-semibold uppercase tracking-[0.2em] text-slate-500">Advanced specialized services with cutting edge technology</p>
 
-          <div className="relative mt-12 space-y-14">
+          <div className="relative mt-12 space-y-20">
             <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
               <div className="relative h-56 overflow-hidden rounded-xl sm:h-64">
                 <Image

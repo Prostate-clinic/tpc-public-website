@@ -134,13 +134,13 @@ export function Header() {
     <>
     <header
       className={isScrolled
-        ? "sticky top-2 z-30 mx-3 rounded-full border border-black/10 bg-white/95 shadow-lg backdrop-blur transition-all duration-300 md:top-0 md:mx-0 md:rounded-none md:border-x-0 md:border-t-0 md:shadow-none md:overflow-visible"
-        : "sticky top-0 z-30 border-b border-black/10 bg-white/90 backdrop-blur transition-all duration-300 md:overflow-visible"}
+        ? "sticky top-2 z-30 mx-3 rounded-full border border-black/10 bg-white/85 shadow-lg backdrop-blur-2xl transition-all duration-300 md:top-0 md:mx-0 md:rounded-none md:border-x-0 md:border-t-0 md:shadow-none md:overflow-visible"
+        : "sticky top-0 z-30 border-b border-black/10 bg-white/50 backdrop-blur-2xl transition-all duration-300 md:overflow-visible"}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3 sm:px-6 sm:py-5 lg:px-8">
         {/* Logo */}
         <Link href="/" className="font-[cursive] text-2xl font-bold text-black">
-          <Image src="/logo.png" alt="Logo" width={90} height={40} />
+          <Image src="/logo.png" alt="Logo" width={70} height={40} />
         </Link>
 
         {/* Nav */}
@@ -209,11 +209,8 @@ export function Header() {
                 : "pointer-events-none absolute right-0 top-full z-20 mt-2 w-52 -translate-y-1 rounded-md border border-black/10 bg-white py-1 opacity-0 shadow-lg transition-all duration-200 ease-in"}
             >
                 <Link
-                  href={patient ? "/patient-portal?section=book" : "#"}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleProtectedPortalNavigation("book");
-                  }}
+                  href="/appointment"
+                  onClick={() => setApptOpen(false)}
                   className="block px-4 py-2.5 text-sm font-medium hover:bg-indigo-50 hover:text-indigo-700"
                 >
                   Book Appointment
@@ -283,7 +280,7 @@ export function Header() {
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
           <Link href="/" onClick={() => setMobileOpen(false)}>
-            <Image src="/logo.png" alt="Logo" width={90} height={40} />
+            <Image src="/logo.png" alt="Logo" width={70} height={20} />
           </Link>
           <button
             type="button"
@@ -335,16 +332,13 @@ export function Header() {
           </nav>
 
           <div className="mt-4 space-y-2 border-t border-slate-200 pt-4">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOpen(false);
-                handleProtectedPortalNavigation("book");
-              }}
-              className="w-full rounded-full border border-indigo-200 bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700"
+            <Link
+              href="/appointment"
+              onClick={() => setMobileOpen(false)}
+              className="block w-full rounded-full border border-indigo-200 bg-white px-5 py-2.5 text-center text-sm font-semibold text-indigo-700"
             >
               Book Appointment
-            </button>
+            </Link>
             <button
               type="button"
               onClick={() => {

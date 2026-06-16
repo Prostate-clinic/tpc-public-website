@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Mail, MessageCircleMore, PhoneCall, type LucideIcon } from "lucide-react";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
@@ -69,9 +70,9 @@ export default function ContactPage() {
             <p className="mx-auto mt-6 max-w-2xl leading-7 text-slate-200">
               Whether you have questions about treatment, need support, or want to schedule an appointment, our team is here to help.
             </p>
-            <button className="mt-8 rounded-full bg-[#1a1aaa] px-8 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#111188]">
+            <Link href="/appointment" className="mt-8 inline-block rounded-full bg-[#1a1aaa] px-8 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#111188]">
               Book Appointment
-            </button>
+            </Link>
           </div>
         </section>
 

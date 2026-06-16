@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
 import { RecoveryCta } from "@/components/RecoveryCta";
@@ -149,9 +150,9 @@ export default function Services() {
                 Experience specialist-led services powered by AI decision support, advanced imaging, and robotics built for safer recovery.
               </p>
               <div className="mt-7 flex justify-center">
-                <button className="rounded-full bg-[#1a1aaa] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:-translate-y-0.5 hover:bg-[#111188]">
+                <Link href="/appointment" className="rounded-full bg-[#1a1aaa] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/25 transition hover:-translate-y-0.5 hover:bg-[#111188]">
                   Book Appointment
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -213,12 +214,12 @@ export default function Services() {
                       <h3 className="text-2xl font-semibold text-slate-900">{service.title}</h3>
                       <p className="mt-4 leading-7 text-slate-600">{service.description}</p>
                       <div className="mt-6 flex flex-wrap gap-3">
-                        <button className="rounded-full bg-[#1a1aaa] px-6 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-800/20 transition hover:-translate-y-0.5 hover:bg-[#111188]">
+                        <Link href="/appointment" className="rounded-full bg-[#1a1aaa] px-6 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-800/20 transition hover:-translate-y-0.5 hover:bg-[#111188]">
                           Book Appointment
-                        </button>
-                        <button className="rounded-full border border-indigo-200 bg-white px-6 py-2 text-sm font-semibold text-indigo-700 transition hover:-translate-y-0.5 hover:bg-indigo-50">
+                        </Link>
+                        <Link href="/contact" className="rounded-full border border-indigo-200 bg-white px-6 py-2 text-sm font-semibold text-indigo-700 transition hover:-translate-y-0.5 hover:bg-indigo-50">
                           Learn More
-                        </button>
+                        </Link>
                       </div>
                     </div>
 
