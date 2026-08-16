@@ -1,23 +1,16 @@
 import { NextRequest } from "next/server";
 import { serverError } from "@/lib/api-response";
-import { buildBackendUrl } from "@/lib/backend-api";
+import { proxyToBackend } from "@/lib/backend-api";
 
+// Forwards Authorization and x-idempotency-key. The latter is what makes a
+// double-click or a retried request return the ORIGINAL appointment instead of
+// booking a second one.
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-
-    const authHeader = request.headers.get("Authorization");
-    const response = await fetch(buildBackendUrl("/appointments"), {
+    return await proxyToBackend(request, "/appointments", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(authHeader ? { Authorization: authHeader } : {}),
-      },
-      body: JSON.stringify(body),
+      forwardBody: true,
     });
-
-    const data = await response.json();
-    return Response.json(data, { status: response.status });
   } catch (error) {
     return serverError(error);
   }
