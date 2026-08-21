@@ -13,7 +13,7 @@ const pathways = [
 ];
 
 const resources = [
-  { href: "/about", label: "About Imo Robotics and Oncology Center" },
+  { href: "/about", label: "About Imo Robotic Surgery and Oncology Center" },
   { href: "/blog", label: "Health Articles" },
   { href: "/contact", label: "Support Center" },
   { href: "/contact", label: "Insurance & Billing" },
@@ -60,8 +60,8 @@ export function GlobalFooter({ id }: GlobalFooterProps) {
         <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <Image src="/logo.png" alt="Imo Robotics and Oncology Center" width={96} height={44} className="h-10 w-auto" />
-              <span className="text-sm font-semibold tracking-wide text-slate-800">Imo Robotics and Oncology Center</span>
+              <Image src="/logo.png" alt="Imo Robotic Surgery and Oncology Center" width={96} height={44} className="h-10 w-auto" />
+              <span className="text-sm font-semibold tracking-wide text-slate-800">Imo Robotic Surgery and Oncology Center</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-7 text-slate-600">
               Advanced prostate and urologic care powered by precision robotics, AI-assisted diagnostics, and multidisciplinary expertise.
@@ -109,7 +109,7 @@ export function GlobalFooter({ id }: GlobalFooterProps) {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500">
-          <p>© {year} Imo Robotics and Oncology Center. All rights reserved.</p>
+          <p>© {year} Imo Robotic Surgery and Oncology Center. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/contact" className="transition hover:text-slate-700">Privacy Policy</Link>
             <Link href="/contact" className="transition hover:text-slate-700">Terms of Service</Link>

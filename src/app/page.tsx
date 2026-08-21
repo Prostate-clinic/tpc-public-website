@@ -118,7 +118,7 @@ export default async function Home() {
             <p className="text-sm font-semibold uppercase tracking-[0.17em] text-[var(--primary)]">Who We Are</p>
             <h2 className="mt-3 text-3xl font-bold sm:text-4xl">A New Standard in AI-Integrated Urology</h2>
             <p className="mt-5 leading-7 text-slate-600">
-              Imo Robotics and Oncology Center is a specialist medical institution focused on technology-enhanced prostate and urological
+              Imo Robotic Surgery and Oncology Center is a specialist medical institution focused on technology-enhanced prostate and urological
               care. We combine expert clinicians with robotics, clinical data intelligence, and continuous monitoring systems.
             </p>
             <p className="mt-4 leading-7 text-slate-600">
@@ -216,7 +216,7 @@ export default async function Home() {
 
         <section className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-bold sm:text-4xl">Patient Testimonials</h2>
-          <p className="mt-3 text-center text-slate-600">Real experiences from people who trusted Imo Robotics and Oncology Center.</p>
+          <p className="mt-3 text-center text-slate-600">Real experiences from people who trusted Imo Robotic Surgery and Oncology Center.</p>
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {[
               "The team explained every step clearly and the digital updates made my treatment journey less stressful.",
