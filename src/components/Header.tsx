@@ -137,7 +137,7 @@ export function Header() {
         ? "sticky top-2 z-30 mx-3 rounded-full border border-black/10 bg-white/85 shadow-lg backdrop-blur-2xl transition-all duration-300 md:top-0 md:mx-0 md:rounded-none md:border-x-0 md:border-t-0 md:shadow-none md:overflow-visible"
         : "sticky top-0 z-30 border-b border-black/10 bg-white/50 backdrop-blur-2xl transition-all duration-300 md:overflow-visible"}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3 sm:px-6 sm:py-5 lg:px-8">
+      <div className="mx-auto flex w-full items-center justify-between px-5 py-3 sm:px-6 sm:py-5 lg:px-8">
         {/* Logo */}
         <Link href="/" className="font-[cursive] text-2xl font-bold text-black">
           <Image src="/logo.png" alt="Logo" width={70} height={40} />
