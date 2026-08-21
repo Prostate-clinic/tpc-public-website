@@ -1128,7 +1128,7 @@ export function AppointmentFlow() {
                                                     <button
                                                         type="button"
                                                         onClick={() => shiftMonth(-1)}
-                                                        className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-600 transition hover:bg-slate-50"
+                                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:border-slate-300"
                                                         aria-label="Previous month"
                                                     >
                                                         ‹
@@ -1137,7 +1137,7 @@ export function AppointmentFlow() {
                                                     <button
                                                         type="button"
                                                         onClick={() => shiftMonth(1)}
-                                                        className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-600 transition hover:bg-slate-50"
+                                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:border-slate-300"
                                                         aria-label="Next month"
                                                     >
                                                         ›
@@ -1187,9 +1187,16 @@ export function AppointmentFlow() {
                                                 {monthLoading && <p className="mt-3 text-xs text-slate-500">Loading the calendar...</p>}
                                                 {monthError && <p className="mt-3 text-xs text-red-600">{monthError}</p>}
 
-                                                <p className="mt-4 text-xs leading-5 text-slate-500">
-                                                    Greyed-out days have nothing open for this consultation type.
-                                                </p>
+                                                <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
+                                                    <span className="flex items-center gap-1">
+                                                        <span className="inline-block h-2 w-2 rounded-full bg-indigo-100" />
+                                                        Available
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <span className="inline-block h-2 w-2 rounded-full bg-slate-200" />
+                                                        Unavailable
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             {/* Slots */}
@@ -1201,7 +1208,11 @@ export function AppointmentFlow() {
                                                 )}
 
                                                 {!selectedDate ? (
-                                                    <p className="text-sm text-slate-500">Pick a date to see open times.</p>
+                                                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                                                        <CalendarDays className="h-8 w-8 text-slate-300" />
+                                                        <p className="mt-3 text-sm font-medium text-slate-700">Pick a date to see open times</p>
+                                                        <p className="mt-1 text-xs text-slate-400">Available days are highlighted on the calendar</p>
+                                                    </div>
                                                 ) : (
                                                     <>
                                                         <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -1215,7 +1226,12 @@ export function AppointmentFlow() {
                                                             )}
                                                         </div>
 
-                                                        {slotsLoading && <p className="mt-4 text-sm text-slate-500">Loading times...</p>}
+                                                        {slotsLoading && (
+                                                            <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                                                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600" />
+                                                                Loading times...
+                                                            </div>
+                                                        )}
 
                                                         {slotsError && (
                                                             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -1238,15 +1254,30 @@ export function AppointmentFlow() {
                                                                             key={slot.startAt}
                                                                             type="button"
                                                                             onClick={() => chooseSlot(slot)}
-                                                                            className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${selected
-                                                                                ? "border-indigo-500 bg-[#1a1aaa] text-white"
-                                                                                : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300"
+                                                                            className={`group relative rounded-xl border px-3 py-3 text-left transition ${selected
+                                                                                ? "border-indigo-500 bg-[#1a1aaa] text-white ring-2 ring-indigo-200"
+                                                                                : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:shadow-sm"
                                                                                 }`}
                                                                         >
-                                                                            {slot.startTime}
+                                                                            <span className="block text-sm font-semibold">{slot.startTime} – {slot.endTime}</span>
+                                                                            <span className={`mt-0.5 block text-[11px] ${selected ? "text-indigo-200" : "text-slate-400"}`}>
+                                                                                {slot.durationMinutes} min
+                                                                            </span>
+                                                                            {selected && (
+                                                                                <Check className="absolute right-2 top-2 h-4 w-4 text-white" />
+                                                                            )}
                                                                         </button>
                                                                     );
                                                                 })}
+                                                            </div>
+                                                        )}
+
+                                                        {selectedSlot && (
+                                                            <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+                                                                <span className="font-semibold">Selected:</span>{" "}
+                                                                {formatISODateLong(selectedDate)},{" "}
+                                                                {selectedSlot.startTime} – {selectedSlot.endTime}
+                                                                <span className="ml-2 text-xs text-indigo-500">({selectedSlot.durationMinutes} min)</span>
                                                             </div>
                                                         )}
                                                     </>
