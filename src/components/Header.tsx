@@ -39,6 +39,26 @@ export function Header() {
     setApptOpen(false);
   }, [pathname]);
 
+  // Deep link: /?signin=1 opens the login modal directly, so pages like the
+  // patient portal can offer real "Sign in" buttons instead of telling people
+  // to go find the header. The param is stripped immediately so a refresh or
+  // back-navigation does not re-trigger the modal.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("signin") !== "1") return;
+
+    params.delete("signin");
+    const remaining = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${remaining ? `?${remaining}` : ""}`);
+
+    // Auth hydrates from sessionStorage AFTER mount, so `patient` is still
+    // null here even for signed-in users — check storage instead. Someone
+    // with an active session has no business seeing a login prompt.
+    if (!sessionStorage.getItem("patient_auth")) {
+      openLoginModal();
+    }
+  }, []);
+
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > 8);

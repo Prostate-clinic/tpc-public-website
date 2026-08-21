@@ -215,14 +215,14 @@ export default function PatientPortalPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">Patient Portal</p>
             <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Sign in required</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
-              Please sign in from the header to access your portal, appointment history, and booking tools.
+              Sign in to access your portal, appointment history, and booking tools.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/"
+                href="/?signin=1"
                 className="rounded-full bg-[#1a1aaa] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111188]"
               >
-                Go Home
+                Sign in
               </Link>
               <Link
                 href="/register"

@@ -240,7 +240,7 @@ export default function BlogPage() {
             <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
               Stay up to date with the latest
               <br />
-              from The Prostate Clinic
+              from The IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE
             </h1>
             <p className="mx-auto mt-6 max-w-2xl leading-7 text-slate-200">
               Explore expert articles, surgical milestones, and practical updates on prostate health, kidney care, and advanced treatment options.

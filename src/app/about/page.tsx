@@ -221,7 +221,7 @@ export default function About() {
                         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-700">Who We Are</p>
                         <h2 className="mt-3 text-4xl font-bold">Clinical Excellence, Intentionally Delivered</h2>
                         <p className="mx-auto mt-4 max-w-3xl leading-7 text-slate-600">
-                            The Prostate Clinic is focused on advanced diagnosis and treatment pathways that combine research, technology,
+                            The IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE is focused on advanced diagnosis and treatment pathways that combine research, technology,
                             and specialist care teams under one coordinated system.
                         </p>
                     </div>
