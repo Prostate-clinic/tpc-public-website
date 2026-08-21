@@ -87,7 +87,7 @@ export default function DepartmentsPage() {
           description:
             "Advanced sampling and blood analysis workflows supporting oncology and precision-urology pathways.",
           icon: "PH",
-          image: "/departments/phlebotomy.png"
+          image: "/departments/Phlebotomy.png"
         },
       ],
     },
