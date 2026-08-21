@@ -65,7 +65,7 @@ export default function ContactPage() {
             <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
               Get in Touch With The
               <br />
-              IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE
+              Imo Robotic Surgery and Oncology Center
             </h1>
             <p className="mx-auto mt-6 max-w-2xl leading-7 text-slate-200">
               Whether you have questions about treatment, need support, or want to schedule an appointment, our team is here to help.

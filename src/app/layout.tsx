@@ -19,11 +19,11 @@ const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://imoroboticscenter.
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE | Robotic Urology & AI-Assisted Care",
-    template: "%s | IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
+    default: "Imo Robotic Surgery and Oncology Center | Robotic Urology & AI-Assisted Care",
+    template: "%s | Imo Robotic Surgery and Oncology Center",
   },
   description:
-    "Advanced robotic urology, minimally invasive surgery, diagnostics, and specialist-led treatment pathways at IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE.",
+    "Advanced robotic urology, minimally invasive surgery, diagnostics, and specialist-led treatment pathways at Imo Robotic Surgery and Oncology Center.",
   keywords: [
     "robotic urology",
     "urology clinic",
@@ -33,16 +33,16 @@ export const metadata: Metadata = {
     "minimally invasive surgery",
     "urologist",
     "healthcare diagnostics",
-    "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
+    "Imo Robotic Surgery and Oncology Center",
   ],
   alternates: {
     canonical: "/",
   },
   category: "healthcare",
-  applicationName: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
-  authors: [{ name: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE" }],
-  creator: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
-  publisher: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
+  applicationName: "Imo Robotic Surgery and Oncology Center",
+  authors: [{ name: "Imo Robotic Surgery and Oncology Center" }],
+  creator: "Imo Robotic Surgery and Oncology Center",
+  publisher: "Imo Robotic Surgery and Oncology Center",
   robots: {
     index: true,
     follow: true,
@@ -63,8 +63,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
-    title: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE | Robotic Urology & AI-Assisted Care",
+    siteName: "Imo Robotic Surgery and Oncology Center",
+    title: "Imo Robotic Surgery and Oncology Center | Robotic Urology & AI-Assisted Care",
     description:
       "Book appointments with specialist urologists and access robotic, precision-led treatment options.",
     images: [
@@ -72,13 +72,13 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE",
+        alt: "Imo Robotic Surgery and Oncology Center",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE | Robotic Urology & AI-Assisted Care",
+    title: "Imo Robotic Surgery and Oncology Center | Robotic Urology & AI-Assisted Care",
     description:
       "Specialist robotic urology services, modern diagnostics, and patient-first treatment pathways.",
     images: ["/logo.png"],

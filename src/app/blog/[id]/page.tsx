@@ -73,7 +73,7 @@ function fallbackContent(title: string, excerpt: string, category: string) {
     <p>${excerpt}</p>
     <p><strong>${title}</strong> remains an important subject in modern patient-centered care. In clinical practice, prevention, early diagnosis, and continuous follow-up significantly improve treatment outcomes for patients with prostate and kidney-related conditions.</p>
     <h3>Clinical perspective</h3>
-    <p>At IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE, specialists combine diagnostics, evidence-based protocols, and precision-guided intervention strategies to improve safety and recovery.</p>
+    <p>At Imo Robotic Surgery and Oncology Center, specialists combine diagnostics, evidence-based protocols, and precision-guided intervention strategies to improve safety and recovery.</p>
     <h3>Practical guidance for patients</h3>
     <ul>
       <li>Keep routine screening schedules and follow-up appointments.</li>

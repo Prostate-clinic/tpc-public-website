@@ -105,7 +105,7 @@ function toBlogCards(rawBlogs: ApiBlog[]): BlogCard[] {
       excerpt:
         blog.excerpt ||
         (bodyText.length > 170 ? `${bodyText.slice(0, 167)}...` : bodyText) ||
-        "Clinical insights from the IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE Center specialist team.",
+        "Clinical insights from the Imo Robotic Surgery and Oncology Center Center specialist team.",
       category: blog.tags?.[0] || "Medical",
       image: normalizeBlogImage(blog.coverImage),
       author: blog.author?.name || "IMO Medical Team",
@@ -240,7 +240,7 @@ export default function BlogPage() {
             <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
               Stay up to date with the latest
               <br />
-              from The IMO ROBOTIC SURGERY AND ONCOLOGY CENTRE
+              from The Imo Robotic Surgery and Oncology Center
             </h1>
             <p className="mx-auto mt-6 max-w-2xl leading-7 text-slate-200">
               Explore expert articles, surgical milestones, and practical updates on prostate health, kidney care, and advanced treatment options.
