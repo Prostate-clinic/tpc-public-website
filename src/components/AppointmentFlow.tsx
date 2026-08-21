@@ -193,9 +193,9 @@ function formatServicePrice(value: number | string) {
     return `From NGN ${numericValue.toLocaleString("en-NG")}`;
 }
 
-function getStepStatus(stepId: number, currentStep: number) {
-    if (stepId < currentStep) return "complete";
+function getStepStatus(stepId: number, currentStep: number, highestReached: number) {
     if (stepId === currentStep) return "active";
+    if (stepId <= highestReached) return "complete";
     return "pending";
 }
 
@@ -245,6 +245,10 @@ export function AppointmentFlow() {
     const { patient, token, login } = usePatientAuth();
 
     const [currentStep, setCurrentStep] = useState(1);
+    // The furthest step the user has reached. Clicking a step in the header
+    // only jumps backward to completed steps — never forward past where they
+    // are. This state starts at 1 and grows as they complete each step.
+    const [highestStepReached, setHighestStepReached] = useState(1);
     const [activeServiceCategory, setActiveServiceCategory] = useState<(typeof serviceCategories)[number]["id"]>("all");
 
     const [services, setServices] = useState<ServiceOption[]>([]);
@@ -379,9 +383,18 @@ export function AppointmentFlow() {
         if (consultation) setSelectedConsultation(consultation);
         if (draft.date) setSelectedDate(draft.date);
 
-        if (service && doctor && consultation) setCurrentStep(4);
-        else if (service && doctor) setCurrentStep(3);
-        else if (service) setCurrentStep(2);
+        if (service && doctor && consultation) {
+            setCurrentStep(4);
+            setHighestStepReached(4);
+        }
+        else if (service && doctor) {
+            setCurrentStep(3);
+            setHighestStepReached(3);
+        }
+        else if (service) {
+            setCurrentStep(2);
+            setHighestStepReached(2);
+        }
     }, [services, doctors, servicesLoading, doctorsLoading]);
 
     useEffect(() => {
@@ -671,7 +684,11 @@ export function AppointmentFlow() {
 
     const moveNext = () => {
         if (!canContinue || currentStep >= 5) return;
-        setCurrentStep((prev) => prev + 1);
+        setCurrentStep((prev) => {
+            const next = prev + 1;
+            setHighestStepReached((h) => Math.max(h, next));
+            return next;
+        });
     };
 
     const moveBack = () => {
@@ -756,14 +773,21 @@ export function AppointmentFlow() {
                 <div className="overflow-x-auto pb-3 scrollbar-hide">
                     <div className="flex min-w-205 items-start px-2 pt-1">
                         {steps.map((step, index) => {
-                            const status = getStepStatus(step.id, currentStep);
+                            const status = getStepStatus(step.id, currentStep, highestStepReached);
                             const StepIcon = step.icon;
                             return (
                                 <div key={step.id} className="flex flex-1 items-start">
                                     <button
                                         type="button"
-                                        onClick={() => setCurrentStep(step.id)}
-                                        disabled={Boolean(booked)}
+                                        onClick={() => {
+                                            // Allow only backward navigation to completed steps.
+                                            // Forward jumps are blocked: the user must complete
+                                            // each step before advancing to the next.
+                                            if (step.id <= currentStep) {
+                                                setCurrentStep(step.id);
+                                            }
+                                        }}
+                                        disabled={Boolean(booked) || step.id > currentStep}
                                         className="group flex min-w-32.5 flex-col items-center text-center transition disabled:cursor-not-allowed"
                                         aria-current={status === "active" ? "step" : undefined}
                                     >

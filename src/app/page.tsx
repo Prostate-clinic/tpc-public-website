@@ -3,6 +3,15 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
 import { buildBackendUrl } from "@/lib/backend-api";
+import { BlogPost } from "@/lib/types";
+
+
+type insight = {
+  id: string,
+  title: string,
+  text: string,
+  img:string
+}
 
 const services = [
   {
@@ -53,10 +62,11 @@ async function fetchBlogs() {
       return [];
     }
 
-    return blogs.map((blog: any) => ({
+    return blogs.map((blog: BlogPost) => ({
       id: blog.id,
       title: blog.title || "Untitled",
       text: blog.excerpt || blog.slug || "",
+      img:blog.coverImage
     }));
   } catch (error) {
     console.error("Failed to fetch blogs:", error);
@@ -241,8 +251,11 @@ export default async function Home() {
             </div>
           ) : (
             <div className="mt-10 grid gap-5 md:grid-cols-3">
-              {insights.map((item: any) => (
+              {insights.map((item: insight) => (
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div>
+                    <Image alt="blog img" src={item.img} width={300} height={300} className="w-full h-full"/>
+                  </div>
                   <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Blog Post</p>
                   <h3 className="mt-3 text-xl font-semibold">{item.title}</h3>
                   <p className="mt-3 leading-7 text-slate-600">{item.text}</p>
