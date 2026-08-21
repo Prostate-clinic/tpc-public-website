@@ -105,7 +105,7 @@ function toBlogCards(rawBlogs: ApiBlog[]): BlogCard[] {
       excerpt:
         blog.excerpt ||
         (bodyText.length > 170 ? `${bodyText.slice(0, 167)}...` : bodyText) ||
-        "Clinical insights from the IMO Robotics Center specialist team.",
+        "Clinical insights from the Imo Robotics and Oncology Center specialist team.",
       category: blog.tags?.[0] || "Medical",
       image: normalizeBlogImage(blog.coverImage),
       author: blog.author?.name || "IMO Medical Team",
