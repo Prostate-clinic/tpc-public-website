@@ -256,7 +256,6 @@ export default async function Home() {
                   <div>
                     <Image alt="blog img" src={item.img} width={300} height={300} className="w-full h-full"/>
                   </div>
-                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Blog Post</p>
                   <h3 className="mt-3 text-xl font-semibold">{item.title}</h3>
                   <p className="mt-3 leading-7 text-slate-600">{item.text}</p>
                   <Link
