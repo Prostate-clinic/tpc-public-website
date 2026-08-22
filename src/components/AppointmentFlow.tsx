@@ -567,6 +567,9 @@ export function AppointmentFlow() {
 
         setSlotsLoading(true);
         setSlotsError("");
+        setDaySlots([]);
+        setDayReason(null);
+        setSelectedSlot(null);
 
         try {
             const query = new URLSearchParams({
