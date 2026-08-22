@@ -1039,21 +1039,25 @@ export function AppointmentFlow() {
                                             <div className="grid gap-3 sm:grid-cols-2">
                                                 {selectedDoctor.consultationTypes.map((consultation) => {
                                                     const selected = selectedConsultation?.id === consultation.id;
+                                                    const isVideoDisabled = consultation.isVideo;
                                                     return (
                                                         <button
                                                             key={consultation.id}
                                                             type="button"
-                                                            onClick={() => chooseConsultation(consultation)}
-                                                            className={`rounded-2xl border p-4 text-left transition ${selected
-                                                                ? "border-indigo-300 bg-indigo-50/60 shadow-md shadow-indigo-100"
-                                                                : "border-slate-200 bg-white hover:border-indigo-200"
+                                                            onClick={() => !isVideoDisabled && chooseConsultation(consultation)}
+                                                            disabled={isVideoDisabled}
+                                                            className={`rounded-2xl border p-4 text-left transition ${isVideoDisabled
+                                                                ? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-60"
+                                                                : selected
+                                                                    ? "border-indigo-300 bg-indigo-50/60 shadow-md shadow-indigo-100"
+                                                                    : "border-slate-200 bg-white hover:border-indigo-200"
                                                                 }`}
                                                         >
                                                             <div className="flex items-start justify-between gap-3">
                                                                 <p className="text-base font-semibold text-slate-900">{consultation.name}</p>
                                                                 {consultation.isVideo && (
-                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-cyan-100 px-2.5 py-1 text-[11px] font-semibold text-cyan-800">
-                                                                        <Video className="h-3 w-3" /> Video
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                                                                        <Video className="h-3 w-3" /> Coming soon
                                                                     </span>
                                                                 )}
                                                             </div>
