@@ -744,8 +744,27 @@ export function AppointmentFlow() {
                 throw new Error(payload?.message || "Unable to book this appointment.");
             }
 
-            setBooked(payload.appointment as BookedAppointment);
+            const appointment = payload.appointment as BookedAppointment;
+            setBooked(appointment);
             sessionStorage.removeItem(DRAFT_KEY);
+
+            // Initiate payment and redirect to payment page
+            try {
+                const payRes = await fetch(`/api/payments/initiate/${appointment.id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                });
+                const payData = await payRes.json();
+                if (payRes.ok && payData.paymentLink) {
+                    window.location.href = payData.paymentLink;
+                }
+            } catch {
+                // Payment initiation failed — appointment is still reserved.
+                // User can pay later from the patient portal.
+            }
         } catch (error) {
             setSubmitError(error instanceof Error ? error.message : "Something went wrong.");
         } finally {
@@ -1427,7 +1446,7 @@ export function AppointmentFlow() {
                                     {booked && (
                                         <div className="space-y-3">
                                             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-                                                Your appointment is reserved and is awaiting payment.
+                                                Redirecting you to payment...
                                             </div>
 
                                             {booked.expiresAt && <HoldCountdown expiresAt={booked.expiresAt} />}
