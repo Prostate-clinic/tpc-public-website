@@ -41,8 +41,8 @@ const services = [
 ];
 
 const partners = [
-  { name: "Partner 1", logo: "/partners/logo.png" },
-  { name: "Partner 2", logo: "/partners/logonew.png" },
+  { name: "Partner 1", logo: "/partners/idcl.png" },
+  { name: "Partner 2", logo: "/partners/imogov.png" },
 ];
 
 async function fetchBlogs() {
@@ -219,21 +219,23 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl">Meet our Partners</h2>
-          <p className="text-center text-[11px] mt-3 font-semibold uppercase tracking-[0.2em] text-slate-500">Trusted organizations we work with</p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-10 sm:gap-14">
-            {partners.map((partner) => (
-              <div key={partner.name} className="flex items-center justify-center">
-                <Image
-                  src={partner.logo}
-                  alt={partner.name}
-                  width={140}
-                  height={60}
-                  className="object-contain opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0"
-                />
-              </div>
-            ))}
+        <section className="bg-slate-100">
+          <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
+            <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl">Meet our Partners</h2>
+            <p className="text-center text-[11px] mt-3 font-semibold uppercase tracking-[0.2em] text-slate-500">Trusted organizations we work with</p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-10 sm:gap-14">
+              {partners.map((partner) => (
+                <div key={partner.name} className="flex h-28 w-44 items-center justify-center rounded-xl px-6 py-4 shadow-sm">
+                  <Image
+                    src={partner.logo}
+                    alt={partner.name}
+                    width={140}
+                    height={60}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
