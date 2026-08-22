@@ -40,6 +40,11 @@ const services = [
   },
 ];
 
+const partners = [
+  { name: "Partner 1", logo: "/partners/logo.png" },
+  { name: "Partner 2", logo: "/partners/logonew.png" },
+];
+
 async function fetchBlogs() {
   try {
     const url = buildBackendUrl("/blogs?page=1&limit=3");
@@ -111,17 +116,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-6xl px-5 py-10 text-center sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.17em] text-slate-500">Trusted by patients and care partners</p>
-          <div className="mt-6 grid grid-cols-2 gap-4 text-sm font-bold text-slate-500 sm:grid-cols-3 lg:grid-cols-6">
-            <span className="rounded-md border border-slate-200 bg-white py-3">RoboCare</span>
-            <span className="rounded-md border border-slate-200 bg-white py-3">MedIntel</span>
-            <span className="rounded-md border border-slate-200 bg-white py-3">UroLink</span>
-            <span className="rounded-md border border-slate-200 bg-white py-3">ClinOps</span>
-            <span className="rounded-md border border-slate-200 bg-white py-3">NovaLab</span>
-            <span className="rounded-md border border-slate-200 bg-white py-3">CareFlow</span>
-          </div>
-        </section>
+
 
         <section id="about" className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-14 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>
@@ -221,6 +216,24 @@ export default async function Home() {
                 See all
               </Link>
             </div>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl">Meet our Partners</h2>
+          <p className="text-center text-[11px] mt-3 font-semibold uppercase tracking-[0.2em] text-slate-500">Trusted organizations we work with</p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-10 sm:gap-14">
+            {partners.map((partner) => (
+              <div key={partner.name} className="flex items-center justify-center">
+                <Image
+                  src={partner.logo}
+                  alt={partner.name}
+                  width={140}
+                  height={60}
+                  className="object-contain opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0"
+                />
+              </div>
+            ))}
           </div>
         </section>
 
