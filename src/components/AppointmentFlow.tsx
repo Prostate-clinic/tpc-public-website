@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarDays, Check, ClipboardCheck, FileText, Stethoscope, UserRound, Video } from "lucide-react";
+import { CalendarDays, Check, ClipboardCheck, CreditCard, FileText, Stethoscope, UserRound, Video } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
 
@@ -112,7 +112,8 @@ const steps: Step[] = [
     { id: 2, title: "Specialist", subtitle: "Choose your clinician", icon: UserRound },
     { id: 3, title: "Consultation", subtitle: "How long you need with the doctor", icon: ClipboardCheck },
     { id: 4, title: "Schedule", subtitle: "Pick from the doctor's open times", icon: CalendarDays },
-    { id: 5, title: "Confirm", subtitle: "Review and reserve", icon: FileText },
+    { id: 5, title: "Review", subtitle: "Check your appointment details", icon: FileText },
+    { id: 6, title: "Payment", subtitle: "Confirm and pay", icon: CreditCard },
 ];
 
 const serviceCategories = [
@@ -340,10 +341,10 @@ export function AppointmentFlow() {
         if (currentStep === 1) return Boolean(selectedService);
         if (currentStep === 2) return Boolean(selectedDoctor);
         if (currentStep === 3) return Boolean(selectedConsultation);
-        // No account required, and no login gate. Details are taken on step 5.
         if (currentStep === 4) return Boolean(selectedSlot);
+        if (currentStep === 5) return contactValid;
         return false;
-    }, [currentStep, selectedService, selectedDoctor, selectedConsultation, selectedSlot]);
+    }, [currentStep, selectedService, selectedDoctor, selectedConsultation, selectedSlot, contactValid]);
 
     // ── Draft: survives the trip to /register and back ───────────────────────
     useEffect(() => {
@@ -686,7 +687,7 @@ export function AppointmentFlow() {
     };
 
     const moveNext = () => {
-        if (!canContinue || currentStep >= 5) return;
+        if (!canContinue || currentStep >= 6) return;
         setCurrentStep((prev) => {
             const next = prev + 1;
             setHighestStepReached((h) => Math.max(h, next));
@@ -1427,6 +1428,78 @@ export function AppointmentFlow() {
                                         </label>
                                     )}
 
+                                    {/* Amount to pay */}
+                                    {selectedConsultation && (
+                                        <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-semibold text-slate-700">Amount to pay</span>
+                                                <span className="text-lg font-bold text-indigo-700">
+                                                    {formatNaira(selectedConsultation.fee)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {submitError && (
+                                        <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                                            {submitError}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* ── Step 6: payment summary ──────────────────────────────── */}
+                            {currentStep === 6 && (
+                                <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                                    <div className="rounded-xl bg-slate-50 p-3">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Service</p>
+                                        <p className="mt-1 text-sm text-slate-800">{selectedService?.name ?? "Not selected"}</p>
+                                    </div>
+                                    <div className="rounded-xl bg-slate-50 p-3">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Specialist</p>
+                                        <p className="mt-1 text-sm text-slate-800">{selectedDoctor?.name ?? "Not selected"}</p>
+                                    </div>
+                                    <div className="rounded-xl bg-slate-50 p-3">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Consultation</p>
+                                        <p className="mt-1 text-sm text-slate-800">
+                                            {selectedConsultation
+                                                ? `${selectedConsultation.name} · ${selectedConsultation.durationMinutes} min`
+                                                : "Not selected"}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-xl bg-slate-50 p-3">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Date & Time</p>
+                                        <p className="mt-1 text-sm text-slate-800">
+                                            {selectedDate && selectedSlot
+                                                ? `${formatISODateLong(selectedDate)}, ${selectedSlot.startTime} – ${selectedSlot.endTime}`
+                                                : "Not selected"}
+                                        </p>
+                                        {timezone && <p className="mt-1 text-xs text-slate-500">Clinic time ({timezone})</p>}
+                                    </div>
+                                    <div className="rounded-xl bg-slate-50 p-3">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Patient</p>
+                                        <p className="mt-1 text-sm text-slate-800">{contactName}</p>
+                                        <p className="text-xs text-slate-500">{contactEmail}</p>
+                                        {contactPhone && <p className="text-xs text-slate-500">{contactPhone}</p>}
+                                    </div>
+
+                                    {/* Payment breakdown */}
+                                    <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 space-y-2">
+                                        <p className="text-xs uppercase tracking-[0.2em] text-indigo-600 font-semibold">Payment Summary</p>
+                                        {selectedConsultation && (
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-600">Consultation fee</span>
+                                                <span className="font-medium text-slate-800">{formatNaira(selectedConsultation.fee)}</span>
+                                            </div>
+                                        )}
+                                        <div className="border-t border-indigo-200 pt-2 flex items-center justify-between">
+                                            <span className="text-sm font-semibold text-slate-700">Total</span>
+                                            <span className="text-xl font-bold text-indigo-700">
+                                                {selectedConsultation ? formatNaira(selectedConsultation.fee) : "—"}
+                                            </span>
+                                        </div>
+                                    </div>
+
                                     {submitError && (
                                         <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                                             {submitError}
@@ -1441,7 +1514,7 @@ export function AppointmentFlow() {
                                                 disabled={!selectedSlot || !contactValid || isSubmitting}
                                                 className="w-full rounded-full bg-[#1a1aaa] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#111188] disabled:cursor-not-allowed disabled:opacity-50"
                                             >
-                                                {isSubmitting ? "Reserving..." : "Reserve Appointment"}
+                                                {isSubmitting ? "Processing..." : "Proceed to Payment"}
                                             </button>
                                         </div>
                                     )}
@@ -1466,7 +1539,7 @@ export function AppointmentFlow() {
                             )}
                         </div>
 
-                        {!booked && (
+                        {!booked && currentStep < 6 && (
                             <div className="mt-6 flex items-center justify-between gap-3">
                                 <button
                                     type="button"
@@ -1479,7 +1552,7 @@ export function AppointmentFlow() {
                                 <button
                                     type="button"
                                     onClick={moveNext}
-                                    disabled={!canContinue || currentStep === 5}
+                                    disabled={!canContinue}
                                     className="rounded-full bg-[#1a1aaa] px-6 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     Continue
