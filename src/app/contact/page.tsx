@@ -7,8 +7,6 @@ import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
 import { RecoveryCta } from "@/components/RecoveryCta";
 
-const PLACEHOLDER_SRC = "/No-Image-Placeholder%20(2).svg";
-
 type ContactCard = {
   title: string;
   text: string;
@@ -34,21 +32,6 @@ const contactCards: ContactCard[] = [
     text: "Speak directly with our team for immediate assistance and guidance.",
     detail: "+2349036947385",
     icon: PhoneCall,
-  },
-];
-
-const locations = [
-  {
-    city: "Owerri, Imo",
-    address: "123 Sample St, Sydney NSW 2000 AU",
-  },
-  {
-    city: "Lagos",
-    address: "200a Muri Okunola Street, Off Ajose Adeogun Street, Victoria Island, Lagos Nigeria",
-  },
-  {
-    city: "London",
-    address: "123 Sample St, London W1C 1DE, United Kingdom",
   },
 ];
 
@@ -126,8 +109,24 @@ export default function ContactPage() {
               </form>
             </div>
 
-            <div className="relative h-132 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-              <Image src={PLACEHOLDER_SRC} alt="Clinic building" fill className="object-cover" />
+            <div className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="relative h-132 w-full">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7!2d7.0368!3d5.4836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMjknMDEuMCJOIDDCsDAyJzEyLjAiRQ!5e0!3m2!1sen!2sng!4v1700000000000"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="absolute inset-0"
+                />
+              </div>
+              <div className="p-6">
+                <p className="text-sm leading-6 text-slate-600">
+                  Inside the Imo State Specialist Hospital Complex, Umuguma, Owerri West L.G.A, Imo State
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -148,33 +147,6 @@ export default function ContactPage() {
                 </article>
               );
             })}
-          </div>
-        </section>
-
-        <section className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold tracking-tight">Locations</h2>
-          <p className="mt-4 max-w-2xl leading-7 text-slate-600">
-            Find our clinic easily and access world-class care at a location designed for your comfort and convenience.
-          </p>
-
-          <div className="mt-10 h-[500px] grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-            <div className="rounded-3xl bg-white p-6 shadow-sm h-full">
-              <div className="space-y-8 border-l-4 border-indigo-700 pl-5">
-                {locations.map((location) => (
-                  <div key={location.city}>
-                    <h3 className="text-xl font-semibold">{location.city}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{location.address}</p>
-                    <a href="#" className="mt-3 inline-block text-sm font-medium text-indigo-700 underline underline-offset-4">
-                      View Map
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative h-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-              <Image src={PLACEHOLDER_SRC} alt="Location map" height={500} width={500} className="object-cover h-full w-full" />
-            </div>
           </div>
         </section>
 
