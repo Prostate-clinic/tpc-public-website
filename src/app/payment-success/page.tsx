@@ -7,14 +7,15 @@ import { CheckCircle, XCircle, Loader2, X } from "lucide-react";
 
 function PaymentPopupContent() {
     const searchParams = useSearchParams();
-    const txRef = searchParams.get("tx_ref");
+    const txRef = searchParams.get("reference") || searchParams.get("tx_ref");
+    const code = searchParams.get("code");
     const status = searchParams.get("status");
 
     const [verificationState, setVerificationState] = useState<"loading" | "success" | "failed" | "pending">("loading");
     const [paymentDetails, setPaymentDetails] = useState<{ amount?: number; reference?: string } | null>(null);
 
     useEffect(() => {
-        if (status === "cancelled") {
+        if (status === "cancelled" || (code && code !== "00")) {
             setVerificationState("failed");
             return;
         }
