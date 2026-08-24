@@ -150,7 +150,7 @@ export default function About() {
             setInsightsError("");
 
             try {
-                const response = await fetch("/api/blogs?page=1&limit=3", { cache: "no-store" });
+                const response = await fetch("/api/blogs?page=1&limit=3");
                 const data = await response.json();
 
                 if (!response.ok) {

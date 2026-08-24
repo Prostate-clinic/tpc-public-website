@@ -51,7 +51,6 @@ async function fetchBlogs() {
     const url = buildBackendUrl("/blogs?page=1&limit=3");
     const response = await fetch(url, {
       method: "GET",
-      cache: "no-store",
       headers: { "Content-Type": "application/json" },
     });
 

@@ -408,7 +408,7 @@ export function AppointmentFlow() {
             setServicesError("");
 
             try {
-                const response = await fetch("/api/services", { cache: "no-store" });
+                const response = await fetch("/api/services");
                 if (!response.ok) throw new Error("Unable to load services right now.");
 
                 const payload = await response.json();
@@ -453,7 +453,7 @@ export function AppointmentFlow() {
             setDoctorsError("");
 
             try {
-                const response = await fetch("/api/doctors", { cache: "no-store" });
+                const response = await fetch("/api/doctors");
                 if (!response.ok) throw new Error("Unable to load specialists right now.");
 
                 const payload = await response.json();
@@ -532,7 +532,6 @@ export function AppointmentFlow() {
                 });
 
                 const response = await fetch(`/api/availability/range?${query}`, {
-                    cache: "no-store",
                     signal: controller.signal,
                 });
                 const payload = await response.json();
@@ -582,9 +581,7 @@ export function AppointmentFlow() {
                 date: selectedDate,
             });
 
-            const response = await fetch(`/api/availability?${query}`, {
-                cache: "no-store",
-            });
+            const response = await fetch(`/api/availability?${query}`);
             const payload = await response.json();
             if (!response.ok) throw new Error(payload?.message || "Unable to load times for this date.");
 

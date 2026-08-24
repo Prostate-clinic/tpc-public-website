@@ -65,7 +65,7 @@ export default function Services() {
       setError("");
 
       try {
-        const response = await fetch("/api/services", { cache: "no-store" });
+        const response = await fetch("/api/services");
         if (!response.ok) {
           throw new Error("Unable to load services right now.");
         }

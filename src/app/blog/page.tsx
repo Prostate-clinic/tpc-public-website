@@ -161,7 +161,7 @@ export default function BlogPage() {
       setUsingFallback(false);
 
       try {
-        const response = await fetch(`/api/blogs?page=${currentPage}&limit=${PAGE_SIZE}`, { cache: "no-store" });
+        const response = await fetch(`/api/blogs?page=${currentPage}&limit=${PAGE_SIZE}`);
         const data = await response.json();
 
         if (!response.ok) {

@@ -5,7 +5,6 @@ export async function GET() {
   try {
     const response = await fetch(buildBackendUrl("/services"), {
       method: "GET",
-      cache: "no-store",
       headers: { "Content-Type": "application/json" },
     });
 

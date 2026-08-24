@@ -130,7 +130,7 @@ export default function SingleBlogPage() {
       setError("");
 
       try {
-        const response = await fetch(`/api/blogs/${params.id}`, { cache: "no-store" });
+        const response = await fetch(`/api/blogs/${params.id}`);
         const data = await response.json();
 
         if (!response.ok) {

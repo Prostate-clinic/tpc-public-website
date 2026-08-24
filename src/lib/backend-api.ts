@@ -49,9 +49,14 @@ export async function proxyToBackend(
     ? JSON.stringify(await request.json().catch(() => ({})))
     : undefined;
 
+  // Only disable cache for non-GET requests. GET requests benefit from
+  // Next.js fetch cache — the backend now has its own TTL cache, so
+  // allowing the frontend layer to cache too eliminates redundant round-trips.
+  const cacheMode = method === "GET" ? "default" : "no-store";
+
   const response = await fetch(
     buildBackendUrl(path, forwardSearch ? request.nextUrl.search : undefined),
-    { method, headers, body, cache: "no-store" },
+    { method, headers, body, cache: cacheMode },
   );
 
   const data = await response.json().catch(() => ({}));

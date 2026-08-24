@@ -6,7 +6,6 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(buildBackendUrl("/blogs", request.nextUrl.search), {
       method: "GET",
-      cache: "no-store",
       headers: { "Content-Type": "application/json" },
     });
 

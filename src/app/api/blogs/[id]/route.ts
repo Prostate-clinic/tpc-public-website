@@ -9,7 +9,6 @@ export async function GET(
     const { id } = await context.params;
     const response = await fetch(buildBackendUrl(`/blogs/${id}`), {
       method: "GET",
-      cache: "no-store",
       headers: { "Content-Type": "application/json" },
     });
 

@@ -65,7 +65,7 @@ export default function DoctorsPage() {
       setError("");
 
       try {
-        const response = await fetch("/api/doctors", { cache: "no-store" });
+        const response = await fetch("/api/doctors");
         if (!response.ok) {
           throw new Error("Unable to load specialists right now.");
         }
