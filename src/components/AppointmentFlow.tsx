@@ -20,6 +20,7 @@ type ServiceOption = {
     name: string;
     duration: string;
     price: string;
+    priceRaw: number;
     blurb: string;
     focus: string[];
 };
@@ -419,6 +420,7 @@ export function AppointmentFlow() {
                     name: service.name,
                     duration: `${service.duration} min`,
                     price: formatServicePrice(service.price),
+                    priceRaw: Number(service.price) || 0,
                     blurb: service.description || "Specialist-led treatment pathway tailored for high-confidence outcomes.",
                     focus:
                         Array.isArray(service.focus) && service.focus.length > 0
@@ -848,7 +850,7 @@ export function AppointmentFlow() {
                     </div>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-6 relative">
                     <div className="rounded-3xl border border-slate-200 p-5 sm:p-6">
                         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">Step {currentStep}</p>
                         <h3 className="mt-2 text-2xl font-semibold text-slate-900">{stepLabel?.title}</h3>
@@ -1495,6 +1497,12 @@ export function AppointmentFlow() {
                                     {/* Payment breakdown */}
                                     <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 space-y-2">
                                         <p className="text-xs uppercase tracking-[0.2em] text-indigo-600 font-semibold">Payment Summary</p>
+                                        {selectedService && (
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-600">{selectedService.name}</span>
+                                                <span className="font-medium text-slate-800">{formatNaira(selectedService.priceRaw)}</span>
+                                            </div>
+                                        )}
                                         {selectedConsultation && (
                                             <div className="flex items-center justify-between text-sm">
                                                 <span className="text-slate-600">Consultation fee</span>
@@ -1504,7 +1512,7 @@ export function AppointmentFlow() {
                                         <div className="border-t border-indigo-200 pt-2 flex items-center justify-between">
                                             <span className="text-sm font-semibold text-slate-700">Total</span>
                                             <span className="text-xl font-bold text-indigo-700">
-                                                {selectedConsultation ? formatNaira(selectedConsultation.fee) : "—"}
+                                                {formatNaira((selectedService?.priceRaw || 0) + (Number(selectedConsultation?.fee) || 0))}
                                             </span>
                                         </div>
                                     </div>
@@ -1575,7 +1583,8 @@ export function AppointmentFlow() {
                         </div>
 
                         {!booked && currentStep < 6 && (
-                            <div className="mt-6 flex items-center justify-between gap-3">
+                            <div className="mt-6 sticky bottom-0 -mx-5 px-5 pb-5 pt-4 -mb-5 bg-white/95 backdrop-blur-sm z-10 border-t border-slate-100">
+                                <div className="flex items-center justify-between gap-3">
                                 <button
                                     type="button"
                                     onClick={moveBack}
@@ -1593,8 +1602,9 @@ export function AppointmentFlow() {
                                     Continue
                                 </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
+                </div>
                 </div>
             </div>
         </section>

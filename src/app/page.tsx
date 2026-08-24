@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
+import { PaymentVerificationPopup } from "@/components/PaymentVerificationPopup";
 import { buildBackendUrl } from "@/lib/backend-api";
 import { BlogPost } from "@/lib/types";
 
@@ -84,6 +85,7 @@ export default async function Home() {
 
   return (
     <div className="bg-[var(--page-bg)] text-[var(--ink)]">
+      <PaymentVerificationPopup />
       <Header />
 
       <main>

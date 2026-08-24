@@ -159,7 +159,6 @@ export default function Services() {
         </section>
 
         <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-40">
-          <p className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-indigo-700">Service Pathways</p>
           <h2 className="mt-3 text-center text-4xl font-bold sm:text-5xl">Explore Our Services</h2>
           <p className="mx-auto mt-4 max-w-2xl text-center leading-7 text-slate-600">
             Choose a pathway to view focused clinical services. Each service card outlines how technology and specialists work together.
