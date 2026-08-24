@@ -285,6 +285,7 @@ export function AppointmentFlow() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState("");
     const [booked, setBooked] = useState<BookedAppointment | null>(null);
+    const [paymentError, setPaymentError] = useState("");
 
     const [signInEmail, setSignInEmail] = useState("");
     const [signInPassword, setSignInPassword] = useState("");
@@ -706,69 +707,73 @@ export function AppointmentFlow() {
 
         setIsSubmitting(true);
         setSubmitError("");
+        setPaymentError("");
 
         try {
-            const response = await fetch("/api/appointments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    // Sent ONLY if the patient happens to be signed in. Booking works
-                    // without it — the appointment is identified by the email, and is
-                    // claimed automatically if they register with it later.
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                    "x-idempotency-key": bookingKey(),
-                },
-                body: JSON.stringify({
-                    doctorId: selectedDoctor.id,
-                    consultationTypeId: selectedConsultation.id,
-                    // Verbatim from /availability. Never rebuilt from the wall clock.
-                    startAt: selectedSlot.startAt,
-                    contactName: contactName.trim(),
-                    contactEmail: contactEmail.trim(),
-                    contactPhone: contactPhone.trim() || undefined,
-                    serviceId: selectedService?.id,
-                    notes: notes.trim() || undefined,
-                }),
-            });
+            let appointmentId: string;
 
-            const payload = await response.json();
-
-            // Someone took the slot between listing and booking. Send them back to
-            // a freshly computed list rather than showing a raw error.
-            if (response.status === 409) {
-                idempotencyKeyRef.current = null;
-                setSelectedSlot(null);
-                setSlotTakenNotice("That time was just taken. Here are the times still open.");
-                setCurrentStep(4);
-                await loadDaySlots();
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(payload?.message || "Unable to book this appointment.");
-            }
-
-            const appointment = payload.appointment as BookedAppointment;
-            setBooked(appointment);
-            sessionStorage.removeItem(DRAFT_KEY);
-
-            // Initiate payment and redirect to payment page
-            try {
-                const payRes = await fetch(`/api/payments/initiate/${appointment.id}`, {
+            if (booked) {
+                // Retry: appointment already created, just re-initiate payment
+                appointmentId = booked.id;
+            } else {
+                // Fresh booking
+                const response = await fetch("/api/appointments", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        "x-idempotency-key": bookingKey(),
                     },
+                    body: JSON.stringify({
+                        doctorId: selectedDoctor.id,
+                        consultationTypeId: selectedConsultation.id,
+                        startAt: selectedSlot.startAt,
+                        contactName: contactName.trim(),
+                        contactEmail: contactEmail.trim(),
+                        contactPhone: contactPhone.trim() || undefined,
+                        serviceId: selectedService?.id,
+                        notes: notes.trim() || undefined,
+                    }),
                 });
-                const payData = await payRes.json();
-                if (payRes.ok && payData.paymentLink) {
-                    window.location.href = payData.paymentLink;
+
+                const payload = await response.json();
+
+                if (response.status === 409) {
+                    idempotencyKeyRef.current = null;
+                    setSelectedSlot(null);
+                    setSlotTakenNotice("That time was just taken. Here are the times still open.");
+                    setCurrentStep(4);
+                    await loadDaySlots();
+                    return;
                 }
-            } catch {
-                // Payment initiation failed — appointment is still reserved.
-                // User can pay later from the patient portal.
+
+                if (!response.ok) {
+                    throw new Error(payload?.message || "Unable to book this appointment.");
+                }
+
+                const appointment = payload.appointment as BookedAppointment;
+                setBooked(appointment);
+                sessionStorage.removeItem(DRAFT_KEY);
+                appointmentId = appointment.id;
             }
+
+            // Initiate payment and redirect to payment page
+            const payRes = await fetch(`/api/payments/initiate/${appointmentId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+            });
+            const payData = await payRes.json();
+
+            if (payRes.ok && payData.paymentLink) {
+                window.location.href = payData.paymentLink;
+                return;
+            }
+
+            // Payment initiation failed
+            setPaymentError(payData?.message || "Unable to start payment. Please try again.");
         } catch (error) {
             setSubmitError(error instanceof Error ? error.message : "Something went wrong.");
         } finally {
@@ -1523,7 +1528,33 @@ export function AppointmentFlow() {
                                         </div>
                                     )}
 
-                                    {booked && (
+                                    {booked && paymentError && (
+                                        <div className="space-y-3">
+                                            <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                                                {paymentError}
+                                            </div>
+
+                                            {booked.expiresAt && <HoldCountdown expiresAt={booked.expiresAt} />}
+
+                                            <button
+                                                type="button"
+                                                onClick={confirmBooking}
+                                                disabled={isSubmitting}
+                                                className="w-full rounded-full bg-[#1a1aaa] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#111188] disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                {isSubmitting ? "Processing..." : "Try Again"}
+                                            </button>
+
+                                            <Link
+                                                href="/patient-portal?section=history"
+                                                className="block w-full rounded-full border border-indigo-200 bg-white px-5 py-3 text-center text-sm font-bold text-indigo-700 transition hover:bg-indigo-50"
+                                            >
+                                                View My Appointments
+                                            </Link>
+                                        </div>
+                                    )}
+
+                                    {booked && !paymentError && (
                                         <div className="space-y-3">
                                             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
                                                 Redirecting you to payment...
