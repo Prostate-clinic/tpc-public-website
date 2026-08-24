@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarDays, Check, ClipboardCheck, CreditCard, FileText, Stethoscope, UserRound, Video } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { CalendarDays, Check, CheckCircle, ClipboardCheck, CreditCard, FileText, Loader2, Stethoscope, UserRound, Video, XCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
 
@@ -244,7 +245,27 @@ function HoldCountdown({ expiresAt }: { expiresAt: string }) {
 }
 
 export function AppointmentFlow() {
+    return (
+        <Suspense
+            fallback={
+                <div className="flex items-center justify-center py-20">
+                    <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+                </div>
+            }
+        >
+            <AppointmentFlowInner />
+        </Suspense>
+    );
+}
+
+function AppointmentFlowInner() {
     const { patient, token, login } = usePatientAuth();
+    const searchParams = useSearchParams();
+
+    const paymentRef = searchParams.get("reference");
+    const paymentCode = searchParams.get("code");
+    const [paymentSuccess, setPaymentSuccess] = useState<"loading" | "success" | "failed" | null>(null);
+    const [paymentDetails, setPaymentDetails] = useState<{ reference?: string } | null>(null);
 
     const [currentStep, setCurrentStep] = useState(1);
     // The furthest step the user has reached. Clicking a step in the header
@@ -319,6 +340,56 @@ export function AppointmentFlow() {
     };
 
     const stepLabel = useMemo(() => steps.find((step) => step.id === currentStep), [currentStep]);
+
+    // ── Handle payment redirect ─────────────────────────────────────────────
+    useEffect(() => {
+        if (!paymentRef) return;
+
+        // Cancelled or error code
+        if (paymentCode && paymentCode !== "00") {
+            setPaymentSuccess("failed");
+            return;
+        }
+
+        setPaymentSuccess("loading");
+
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const verify = async () => {
+            try {
+                const res = await fetch(`/api/payments/verify/${encodeURIComponent(paymentRef)}`);
+                const data = await res.json();
+
+                if (data.verified && data.status === 2) {
+                    setPaymentSuccess("success");
+                    setPaymentDetails({ reference: data.providerReference });
+                    return;
+                }
+
+                if (data.status >= 400) {
+                    setPaymentSuccess("failed");
+                    return;
+                }
+
+                attempts++;
+                if (attempts < maxAttempts) {
+                    setTimeout(verify, 3000);
+                } else {
+                    setPaymentSuccess("failed");
+                }
+            } catch {
+                attempts++;
+                if (attempts < maxAttempts) {
+                    setTimeout(verify, 3000);
+                } else {
+                    setPaymentSuccess("failed");
+                }
+            }
+        };
+
+        verify();
+    }, [paymentRef, paymentCode]);
 
     const filteredServices = useMemo(() => {
         if (activeServiceCategory === "all") return services;
@@ -854,8 +925,80 @@ export function AppointmentFlow() {
                         <p className="mt-2 text-sm text-slate-600">{stepLabel?.subtitle}</p>
 
                         <div className="mt-6">
+                            {/* ── Payment success/failed screen ─────────────────────── */}
+                            {paymentSuccess && (
+                                <div className="space-y-4">
+                                    {paymentSuccess === "loading" && (
+                                        <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white p-8 text-center">
+                                            <Loader2 className="h-12 w-12 animate-spin text-indigo-600" />
+                                            <div>
+                                                <h4 className="text-lg font-semibold text-slate-900">Confirming your payment...</h4>
+                                                <p className="mt-1 text-sm text-slate-600">Please wait while we verify your transaction.</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {paymentSuccess === "success" && (
+                                        <div className="flex flex-col items-center gap-4 rounded-2xl border border-emerald-200 bg-white p-8 text-center">
+                                            <CheckCircle className="h-14 w-14 text-emerald-600" />
+                                            <div>
+                                                <h4 className="text-xl font-bold text-slate-900">Payment Confirmed!</h4>
+                                                <p className="mt-2 text-sm text-slate-600">
+                                                    Your appointment has been confirmed. You will receive a confirmation email shortly.
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col gap-2 pt-2 w-full max-w-xs">
+                                                <Link
+                                                    href="/patient-portal?section=history"
+                                                    className="rounded-full bg-[#1a1aaa] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111188]"
+                                                >
+                                                    View My Appointments
+                                                </Link>
+                                                <Link
+                                                    href="/"
+                                                    className="rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                                >
+                                                    Back to Home
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {paymentSuccess === "failed" && (
+                                        <div className="flex flex-col items-center gap-4 rounded-2xl border border-red-200 bg-white p-8 text-center">
+                                            <XCircle className="h-14 w-14 text-red-600" />
+                                            <div>
+                                                <h4 className="text-xl font-bold text-slate-900">Payment Not Completed</h4>
+                                                <p className="mt-2 text-sm text-slate-600">
+                                                    Your payment was not completed. If you were charged, please contact support.
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col gap-2 pt-2 w-full max-w-xs">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setPaymentSuccess(null);
+                                                        setPaymentError("");
+                                                        setBooked(null);
+                                                    }}
+                                                    className="rounded-full bg-[#1a1aaa] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111188]"
+                                                >
+                                                    Try Again
+                                                </button>
+                                                <Link
+                                                    href="/"
+                                                    className="rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                                >
+                                                    Back to Home
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {/* ── Step 1: service ─────────────────────────────────── */}
-                            {currentStep === 1 && (
+                            {!paymentSuccess && currentStep === 1 && (
                                 <div className="grid gap-4 lg:grid-cols-[250px_1fr]">
                                     <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
                                         <p className="mb-3 text-sm font-semibold text-slate-900">Service Categories</p>
@@ -953,7 +1096,7 @@ export function AppointmentFlow() {
                             )}
 
                             {/* ── Step 2: specialist ──────────────────────────────── */}
-                            {currentStep === 2 && (
+                            {!paymentSuccess && currentStep === 2 && (
                                 <div>
                                     {doctorsLoading && (
                                         <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -1027,7 +1170,7 @@ export function AppointmentFlow() {
                             )}
 
                             {/* ── Step 3: consultation type ───────────────────────── */}
-                            {currentStep === 3 && (
+                            {!paymentSuccess && currentStep === 3 && (
                                 <div>
                                     {!selectedDoctor ? (
                                         <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
@@ -1089,7 +1232,7 @@ export function AppointmentFlow() {
                             )}
 
                             {/* ── Step 4: schedule (auth-gated) ───────────────────── */}
-                            {currentStep === 4 && (
+                            {!paymentSuccess && currentStep === 4 && (
                                 <div>
                                     {showSignIn && !isAuthenticated ? (
                                         // OPTIONAL. Booking never requires an account — this panel only
@@ -1320,7 +1463,7 @@ export function AppointmentFlow() {
                             )}
 
                             {/* ── Step 5: confirm ─────────────────────────────────── */}
-                            {currentStep === 5 && (
+                            {!paymentSuccess && currentStep === 5 && (
                                 <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
                                     <div className="rounded-xl bg-slate-50 p-3">
                                         <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Service</p>
@@ -1457,7 +1600,7 @@ export function AppointmentFlow() {
                             )}
 
                             {/* ── Step 6: payment summary ──────────────────────────────── */}
-                            {currentStep === 6 && (
+                            {!paymentSuccess && currentStep === 6 && (
                                 <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
                                     <div className="rounded-xl bg-slate-50 p-3">
                                         <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Service</p>
@@ -1561,25 +1704,19 @@ export function AppointmentFlow() {
 
                                     {booked && !paymentError && (
                                         <div className="space-y-3">
-                                            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-                                                Redirecting you to payment...
+                                            <div className="flex items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+                                                <Loader2 className="h-5 w-5 animate-spin text-indigo-600" />
+                                                <p className="text-sm font-medium text-indigo-800">Redirecting you to payment...</p>
                                             </div>
 
                                             {booked.expiresAt && <HoldCountdown expiresAt={booked.expiresAt} />}
-
-                                            <Link
-                                                href="/patient-portal?section=history"
-                                                className="block w-full rounded-full border border-indigo-200 bg-white px-5 py-3 text-center text-sm font-bold text-indigo-700 transition hover:bg-indigo-50"
-                                            >
-                                                View My Appointments
-                                            </Link>
                                         </div>
                                     )}
                                 </div>
                             )}
                         </div>
 
-                        {!booked && currentStep < 6 && (
+                        {!paymentSuccess && !booked && currentStep < 6 && (
                             <div className="mt-6 sticky bottom-0 -mx-5 px-5 pb-5 pt-4 -mb-5 bg-white/95 backdrop-blur-sm z-10 border-t border-slate-100">
                                 <div className="flex items-center justify-between gap-3">
                                 <button
