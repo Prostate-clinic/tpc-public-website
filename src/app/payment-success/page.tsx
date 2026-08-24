@@ -33,7 +33,7 @@ function PaymentPopupContent() {
                 const res = await fetch(`/api/payments/verify/${encodeURIComponent(txRef)}`);
                 const data = await res.json();
 
-                if (data.verified && data.status === 200) {
+                if (data.verified && data.status === 2) {
                     setVerificationState("success");
                     setPaymentDetails({ amount: data.paid_amount, reference: data.provider_reference });
                     return;
