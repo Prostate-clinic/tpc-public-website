@@ -43,12 +43,6 @@ type ConsultationType = {
     isVideo: boolean;
 };
 
-type Branch = {
-    id: string;
-    name: string;
-    timezone: string;
-};
-
 type DoctorOption = {
     id: string;
     name: string;
@@ -56,7 +50,6 @@ type DoctorOption = {
     image: string;
     bio: string;
     consultationTypes: ConsultationType[];
-    branch: Branch | null;
 };
 
 type ApiDoctor = {
@@ -66,7 +59,6 @@ type ApiDoctor = {
     bio: string | null;
     image: string | null;
     consultationTypes?: ConsultationType[] | null;
-    branch?: Branch | null;
 };
 
 /**
@@ -281,7 +273,7 @@ function AppointmentFlowInner() {
     const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
     const [notes, setNotes] = useState("");
 
-    const timezone = selectedDoctor?.branch?.timezone || "";
+    const timezone = "Africa/Lagos";
     const [monthCursor, setMonthCursor] = useState(() => {
         const [year, month] = clinicToday().split("-").map(Number);
         return { year, month: month - 1 };
@@ -467,7 +459,6 @@ function AppointmentFlowInner() {
                         doctor.bio ||
                         "Experienced specialist delivering evidence-based urologic care with a patient-first approach.",
                     consultationTypes: Array.isArray(doctor.consultationTypes) ? doctor.consultationTypes : [],
-                    branch: doctor.branch ?? null,
                 }));
 
                 if (isMounted) setDoctors(mappedDoctors);
@@ -965,12 +956,6 @@ function AppointmentFlowInner() {
                                                         <p className="mt-1 text-sm text-slate-600">{doctor.specialty}</p>
                                                         <p className="mt-3 text-xs leading-5 text-slate-500">{doctor.bio}</p>
 
-                                                        {doctor.branch && (
-                                                            <p className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-700">
-                                                                {doctor.branch.name}
-                                                            </p>
-                                                        )}
-
                                                         <button
                                                             type="button"
                                                             onClick={() => chooseDoctor(doctor)}
@@ -1062,195 +1047,168 @@ function AppointmentFlowInner() {
                                 </div>
                             )}
 
-                            {/* ── Step 4: schedule (auth-gated) ───────────────────── */}
+                            {/* ── Step 4: schedule ───────────────────── */}
                             {currentStep === 4 && (
-                                <div>
-                                    {!isAuthenticated ? (
-                                        <div className="mx-auto max-w-md rounded-2xl border border-indigo-200 bg-indigo-50/60 p-6 text-center">
-                                            <h4 className="text-lg font-semibold text-slate-900">Sign in to prefill your details</h4>
-                                            <p className="mt-2 text-sm leading-6 text-slate-600">
-                                                You do not need an account to book — this only saves you typing.
-                                            </p>
-                                            <div className="mt-5 flex flex-col gap-3">
-                                                <Link
-                                                    href="/login?redirect=/appointment"
-                                                    className="rounded-full bg-[#1a1aaa] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111188]"
-                                                >
-                                                    Sign In
-                                                </Link>
-                                                <Link
-                                                    href="/register"
-                                                    className="rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                                                >
-                                                    Create Account
-                                                </Link>
-                                            </div>
+                                <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_1fr]">
+                                    {/* Calendar */}
+                                    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                                        <div className="flex items-center justify-between">
+                                            <button
+                                                type="button"
+                                                onClick={() => shiftMonth(-1)}
+                                                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:border-slate-300"
+                                                aria-label="Previous month"
+                                            >
+                                                ‹
+                                            </button>
+                                            <p className="text-sm font-semibold text-slate-900">{monthTitle}</p>
+                                            <button
+                                                type="button"
+                                                onClick={() => shiftMonth(1)}
+                                                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:border-slate-300"
+                                                aria-label="Next month"
+                                            >
+                                                ›
+                                            </button>
                                         </div>
-                                    ) : (
-                                        <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_1fr]">
-                                            {/* Calendar */}
-                                            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                                                <div className="flex items-center justify-between">
+
+                                        <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[11px] font-semibold uppercase text-slate-400">
+                                            {WEEKDAY_LABELS.map((label) => (
+                                                <span key={label}>{label[0]}</span>
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-1 grid grid-cols-7 gap-1">
+                                            {calendarCells.map((cell, index) => {
+                                                if (!cell) return <span key={`pad-${index}`} />;
+
+                                                const day = monthDays[cell.date];
+                                                const isOpen = Boolean(day && day.slots.length > 0);
+                                                const isSelected = selectedDate === cell.date;
+
+                                                return (
                                                     <button
+                                                        key={cell.date}
                                                         type="button"
-                                                        onClick={() => shiftMonth(-1)}
-                                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:border-slate-300"
-                                                        aria-label="Previous month"
+                                                        onClick={() => chooseDate(cell.date)}
+                                                        disabled={!isOpen}
+                                                        title={
+                                                            isOpen
+                                                                ? `${day!.slots.length} open`
+                                                                : reasonMessage(day?.reason ?? null, doctorLabel)
+                                                        }
+                                                        className={`aspect-square rounded-lg text-sm font-medium transition ${isSelected
+                                                            ? "bg-[#1a1aaa] text-white"
+                                                            : isOpen
+                                                                ? "bg-indigo-50 text-indigo-800 hover:bg-indigo-100"
+                                                                : "cursor-not-allowed text-slate-300"
+                                                            }`}
                                                     >
-                                                        ‹
+                                                        {cell.day}
                                                     </button>
-                                                    <p className="text-sm font-semibold text-slate-900">{monthTitle}</p>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => shiftMonth(1)}
-                                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:border-slate-300"
-                                                        aria-label="Next month"
-                                                    >
-                                                        ›
-                                                    </button>
-                                                </div>
+                                                );
+                                            })}
+                                        </div>
 
-                                                <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[11px] font-semibold uppercase text-slate-400">
-                                                    {WEEKDAY_LABELS.map((label) => (
-                                                        <span key={label}>{label[0]}</span>
-                                                    ))}
-                                                </div>
+                                        {monthLoading && <p className="mt-3 text-xs text-slate-500">Loading the calendar...</p>}
+                                        {monthError && <p className="mt-3 text-xs text-red-600">{monthError}</p>}
 
-                                                <div className="mt-1 grid grid-cols-7 gap-1">
-                                                    {calendarCells.map((cell, index) => {
-                                                        if (!cell) return <span key={`pad-${index}`} />;
+                                        <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
+                                            <span className="flex items-center gap-1">
+                                                <span className="inline-block h-2 w-2 rounded-full bg-indigo-100" />
+                                                Available
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <span className="inline-block h-2 w-2 rounded-full bg-slate-200" />
+                                                Unavailable
+                                            </span>
+                                        </div>
+                                    </div>
 
-                                                        const day = monthDays[cell.date];
-                                                        // A day is dead if the engine returned it with no slots, or
-                                                        // never returned it at all (i.e. it is in the past).
-                                                        const isOpen = Boolean(day && day.slots.length > 0);
-                                                        const isSelected = selectedDate === cell.date;
-
-                                                        return (
-                                                            <button
-                                                                key={cell.date}
-                                                                type="button"
-                                                                onClick={() => chooseDate(cell.date)}
-                                                                disabled={!isOpen}
-                                                                title={
-                                                                    isOpen
-                                                                        ? `${day!.slots.length} open`
-                                                                        : reasonMessage(day?.reason ?? null, doctorLabel)
-                                                                }
-                                                                className={`aspect-square rounded-lg text-sm font-medium transition ${isSelected
-                                                                    ? "bg-[#1a1aaa] text-white"
-                                                                    : isOpen
-                                                                        ? "bg-indigo-50 text-indigo-800 hover:bg-indigo-100"
-                                                                        : "cursor-not-allowed text-slate-300"
-                                                                    }`}
-                                                            >
-                                                                {cell.day}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-
-                                                {monthLoading && <p className="mt-3 text-xs text-slate-500">Loading the calendar...</p>}
-                                                {monthError && <p className="mt-3 text-xs text-red-600">{monthError}</p>}
-
-                                                <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
-                                                    <span className="flex items-center gap-1">
-                                                        <span className="inline-block h-2 w-2 rounded-full bg-indigo-100" />
-                                                        Available
-                                                    </span>
-                                                    <span className="flex items-center gap-1">
-                                                        <span className="inline-block h-2 w-2 rounded-full bg-slate-200" />
-                                                        Unavailable
-                                                    </span>
-                                                </div>
+                                    {/* Slots */}
+                                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                        {slotTakenNotice && (
+                                            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                                                {slotTakenNotice}
                                             </div>
+                                        )}
 
-                                            {/* Slots */}
-                                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                                                {slotTakenNotice && (
-                                                    <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                                                        {slotTakenNotice}
+                                        {!selectedDate ? (
+                                            <div className="flex flex-col items-center justify-center py-10 text-center">
+                                                <CalendarDays className="h-8 w-8 text-slate-300" />
+                                                <p className="mt-3 text-sm font-medium text-slate-700">Pick a date to see open times</p>
+                                                <p className="mt-1 text-xs text-slate-400">Available days are highlighted on the calendar</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                                                    <p className="text-sm font-semibold text-slate-900">
+                                                        {formatISODateLong(selectedDate)}
+                                                    </p>
+                                                    {timezone && (
+                                                        <p className="text-xs text-slate-500">
+                                                            Times shown in clinic time ({timezone})
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                {slotsLoading && (
+                                                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600" />
+                                                        Loading times...
                                                     </div>
                                                 )}
 
-                                                {!selectedDate ? (
-                                                    <div className="flex flex-col items-center justify-center py-10 text-center">
-                                                        <CalendarDays className="h-8 w-8 text-slate-300" />
-                                                        <p className="mt-3 text-sm font-medium text-slate-700">Pick a date to see open times</p>
-                                                        <p className="mt-1 text-xs text-slate-400">Available days are highlighted on the calendar</p>
+                                                {slotsError && (
+                                                    <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                                        {slotsError}
                                                     </div>
-                                                ) : (
-                                                    <>
-                                                        <div className="flex flex-wrap items-baseline justify-between gap-2">
-                                                            <p className="text-sm font-semibold text-slate-900">
-                                                                {formatISODateLong(selectedDate)}
-                                                            </p>
-                                                            {timezone && (
-                                                                <p className="text-xs text-slate-500">
-                                                                    Times shown in clinic time ({timezone})
-                                                                </p>
-                                                            )}
-                                                        </div>
-
-                                                        {slotsLoading && (
-                                                            <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-                                                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600" />
-                                                                Loading times...
-                                                            </div>
-                                                        )}
-
-                                                        {slotsError && (
-                                                            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                                                                {slotsError}
-                                                            </div>
-                                                        )}
-
-                                                        {!slotsLoading && !slotsError && daySlots.length === 0 && (
-                                                            <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm text-slate-600">
-                                                                {reasonMessage(dayReason, doctorLabel)}
-                                                            </div>
-                                                        )}
-
-                                                        {daySlots.length > 0 && (
-                                                            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                                                                {daySlots.map((slot) => {
-                                                                    const selected = selectedSlot?.startAt === slot.startAt;
-                                                                    return (
-                                                                        <button
-                                                                            key={slot.startAt}
-                                                                            type="button"
-                                                                            onClick={() => chooseSlot(slot)}
-                                                                            className={`group relative rounded-xl border px-3 py-3 text-left transition ${selected
-                                                                                ? "border-indigo-500 bg-[#1a1aaa] text-white ring-2 ring-indigo-200"
-                                                                                : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:shadow-sm"
-                                                                                }`}
-                                                                        >
-                                                                            <span className="block text-sm font-semibold">{slot.startTime} – {slot.endTime}</span>
-                                                                            <span className={`mt-0.5 block text-[11px] ${selected ? "text-indigo-200" : "text-slate-400"}`}>
-                                                                                {slot.durationMinutes} min
-                                                                            </span>
-                                                                            {selected && (
-                                                                                <Check className="absolute right-2 top-2 h-4 w-4 text-white" />
-                                                                            )}
-                                                                        </button>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        )}
-
-                                                        {selectedSlot && (
-                                                            <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
-                                                                <span className="font-semibold">Selected:</span>{" "}
-                                                                {formatISODateLong(selectedDate)},{" "}
-                                                                {selectedSlot.startTime} – {selectedSlot.endTime}
-                                                                <span className="ml-2 text-xs text-indigo-500">({selectedSlot.durationMinutes} min)</span>
-                                                            </div>
-                                                        )}
-                                                    </>
                                                 )}
-                                            </div>
-                                        </div>
-                                    )}
+
+                                                {!slotsLoading && !slotsError && daySlots.length === 0 && (
+                                                    <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm text-slate-600">
+                                                        {reasonMessage(dayReason, doctorLabel)}
+                                                    </div>
+                                                )}
+
+                                                {daySlots.length > 0 && (
+                                                    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                                        {daySlots.map((slot) => {
+                                                            const selected = selectedSlot?.startAt === slot.startAt;
+                                                            return (
+                                                                <button
+                                                                    key={slot.startAt}
+                                                                    type="button"
+                                                                    onClick={() => chooseSlot(slot)}
+                                                                    className={`group relative rounded-xl border px-3 py-3 text-left transition ${selected
+                                                                        ? "border-indigo-500 bg-[#1a1aaa] text-white ring-2 ring-indigo-200"
+                                                                        : "border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:shadow-sm"
+                                                                        }`}
+                                                                >
+                                                                    <span className="block text-sm font-semibold">{slot.startTime} – {slot.endTime}</span>
+                                                                    <span className={`mt-0.5 block text-[11px] ${selected ? "text-indigo-200" : "text-slate-400"}`}>
+                                                                        {slot.durationMinutes} min
+                                                                    </span>
+                                                                    {selected && (
+                                                                        <Check className="absolute right-2 top-2 h-4 w-4 text-white" />
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+
+                                                {selectedSlot && (
+                                                    <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+                                                        <span className="font-semibold">Selected:</span>{" "}
+                                                        {formatISODateLong(selectedDate)},{" "}
+                                                        {selectedSlot.startTime} – {selectedSlot.endTime}
+                                                        <span className="ml-2 text-xs text-indigo-500">({selectedSlot.durationMinutes} min)</span>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             )}
 

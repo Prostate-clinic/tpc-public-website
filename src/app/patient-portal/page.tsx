@@ -25,7 +25,6 @@ type PortalAppointment = {
   notes?: string | null;
   doctor?: { id?: string; name?: string; specialty?: string } | null;
   consultationType?: { id?: string; name?: string; durationMinutes?: number; fee?: string | number } | null;
-  branch?: { id?: string; name?: string; timezone?: string } | null;
   payment?: { id?: string; status?: string; amount?: string } | null;
 };
 
@@ -119,7 +118,7 @@ export default function PatientPortalPage() {
       .map((appointment) => ({
         id: appointment.payment?.id || appointment.id,
         startAt: appointment.startAt,
-        timezone: appointment.branch?.timezone,
+        timezone: "Africa/Lagos",
         title: appointment.consultationType?.name || "Consultation",
         doctorName: appointment.doctor?.name || "Not assigned",
         amount: appointment.payment?.amount,
@@ -331,7 +330,7 @@ export default function PatientPortalPage() {
                     )}
 
                     {appointments.map((appointment) => {
-                      const timezone = appointment.branch?.timezone;
+                      const timezone = "Africa/Lagos";
                       const badge = STATUS_STYLES[appointment.status] ?? {
                         label: appointment.status,
                         className: "bg-slate-200 text-slate-700",
