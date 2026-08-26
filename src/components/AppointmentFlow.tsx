@@ -1380,7 +1380,7 @@ function AppointmentFlowInner() {
                                         {contactPhone && <p className="text-xs text-slate-500">{contactPhone}</p>}
                                     </div>
 
-                                    {/* Payment breakdown */}
+                                    {/* Payment summary */}
                                     <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 space-y-2">
                                         <p className="text-xs uppercase tracking-[0.2em] text-indigo-600 font-semibold">Payment Summary</p>
                                         {selectedService && (
@@ -1389,16 +1389,10 @@ function AppointmentFlowInner() {
                                                 <span className="font-medium text-slate-800">{formatNaira(selectedService.priceRaw)}</span>
                                             </div>
                                         )}
-                                        {selectedConsultation && (
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-slate-600">Consultation fee</span>
-                                                <span className="font-medium text-slate-800">{formatNaira(selectedConsultation.fee)}</span>
-                                            </div>
-                                        )}
                                         <div className="border-t border-indigo-200 pt-2 flex items-center justify-between">
                                             <span className="text-sm font-semibold text-slate-700">Total</span>
                                             <span className="text-xl font-bold text-indigo-700">
-                                                {formatNaira((selectedService?.priceRaw || 0) + (Number(selectedConsultation?.fee) || 0))}
+                                                {formatNaira(selectedService?.priceRaw || 0)}
                                             </span>
                                         </div>
                                     </div>
