@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
+import PasswordInput from "@/components/PasswordInput";
 
 type Step = "register" | "verify" | "done";
 
@@ -226,8 +227,7 @@ export default function RegisterPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">Password *</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     minLength={6}
                     value={form.password}
@@ -240,8 +240,7 @@ export default function RegisterPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">Confirm Password *</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     value={form.confirmPassword}
                     onChange={(e) => setField("confirmPassword", e.target.value)}

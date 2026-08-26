@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
+import PasswordInput from "@/components/PasswordInput";
 
 function LoginPageInner() {
     const router = useRouter();
@@ -75,8 +76,7 @@ function LoginPageInner() {
 
                         <div>
                             <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
-                            <input
-                                type="password"
+                            <PasswordInput
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}

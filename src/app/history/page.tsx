@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
+import PasswordInput from "@/components/PasswordInput";
 
 type HistoryAppointment = {
   id: string;
@@ -96,10 +97,9 @@ export default function HistoryPage() {
 
             <label className="grid gap-1 text-sm">
               <span className="font-semibold text-slate-700">Password</span>
-              <input
+              <PasswordInput
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                type="password"
                 placeholder="Enter your booking password"
                 className="h-11 rounded-xl border border-slate-300 bg-white px-3 outline-none ring-indigo-300 focus:ring"
               />

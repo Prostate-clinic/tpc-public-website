@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
+import PasswordInput from "@/components/PasswordInput";
 
 export function Header() {
   const [deptOpen, setDeptOpen] = useState(false);
@@ -408,8 +409,7 @@ export function Header() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
@@ -431,7 +431,7 @@ export function Header() {
               <p className="mt-5 text-center text-sm text-gray-500">
                 Don&apos;t have an account?{" "}
                 <Link href="/register" onClick={() => setLoginOpen(false)} className="font-semibold text-indigo-700 hover:underline">
-                  Register / Create Account
+                  Register
                 </Link>
               </p>
               {patient && (
