@@ -18,6 +18,8 @@ type AppointmentStatus =
 
 type PortalAppointment = {
   id: string;
+  referenceNumber?: string;
+  createdAt?: string | null;
   startAt: string;
   endAt: string;
   status: AppointmentStatus;
@@ -25,7 +27,7 @@ type PortalAppointment = {
   notes?: string | null;
   doctor?: { id?: string; name?: string; specialty?: string } | null;
   consultationType?: { id?: string; name?: string; durationMinutes?: number; fee?: string | number } | null;
-  payment?: { id?: string; status?: string; amount?: string } | null;
+  payment?: { id?: string; status?: string; amount?: string; reference?: string | null } | null;
 };
 
 /** Every status the engine can produce. `CLOSED` is gone. */
@@ -53,6 +55,14 @@ const UPCOMING: ReadonlySet<AppointmentStatus> = new Set<AppointmentStatus>([
   "CHECKED_IN",
   "IN_PROGRESS",
 ]);
+
+/** Filter tabs for the appointment history. `ALL` shows every status. */
+const HISTORY_FILTERS: { value: string; label: string; statuses?: ReadonlySet<AppointmentStatus> }[] = [
+  { value: "ALL", label: "All" },
+  { value: "UPCOMING", label: "Upcoming", statuses: new Set<AppointmentStatus>(["PENDING", "CONFIRMED", "CHECKED_IN", "IN_PROGRESS"]) },
+  { value: "COMPLETED", label: "Completed", statuses: new Set<AppointmentStatus>(["COMPLETED"]) },
+  { value: "CANCELLED", label: "Cancelled", statuses: new Set<AppointmentStatus>(["CANCELLED", "REJECTED", "NO_SHOW"]) },
+];
 
 /**
  * Appointments are instants; they are rendered in the CLINIC's timezone, not the
@@ -107,6 +117,8 @@ export default function PatientPortalPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelBusy, setCancelBusy] = useState(false);
@@ -123,11 +135,28 @@ export default function PatientPortalPage() {
         doctorName: appointment.doctor?.name || "Not assigned",
         amount: appointment.payment?.amount,
         status: appointment.payment?.status || "N/A",
+        reference: appointment.payment?.reference || appointment.referenceNumber,
       }));
   }, [appointments]);
 
   const completedPayments = paymentEntries.filter((payment) => payment.status === "COMPLETED").length;
   const upcomingCount = appointments.filter((appointment) => UPCOMING.has(appointment.status)).length;
+
+  // Latest first = most recently created booking on top, then stable by slot time.
+  // The portal shows every appointment the patient has ever held, so recency of
+  // booking is the ordering that reads naturally as "history".
+  const visibleAppointments = useMemo(() => {
+    const activeFilter = HISTORY_FILTERS.find((filter) => filter.value === statusFilter);
+    const filtered = activeFilter?.statuses
+      ? appointments.filter((appointment) => activeFilter.statuses!.has(appointment.status))
+      : appointments;
+    return [...filtered].sort((a, b) => {
+      const byCreated =
+        new Date(b.createdAt || b.startAt).getTime() - new Date(a.createdAt || a.startAt).getTime();
+      if (byCreated !== 0) return byCreated;
+      return new Date(b.startAt).getTime() - new Date(a.startAt).getTime();
+    });
+  }, [appointments, statusFilter]);
 
   const loadAppointments = useCallback(async () => {
     if (!patient || !token) {
@@ -323,13 +352,32 @@ export default function PatientPortalPage() {
 
                 {section === "history" && (
                   <div className="mt-6 space-y-4">
-                    {!loading && !error && appointments.length === 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {HISTORY_FILTERS.map((filter) => (
+                        <button
+                          key={filter.value}
+                          type="button"
+                          onClick={() => setStatusFilter(filter.value)}
+                          className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                            statusFilter === filter.value
+                              ? "bg-[#1a1aaa] text-white"
+                              : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {!loading && !error && visibleAppointments.length === 0 && (
                       <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500">
-                        No appointments found yet. When you complete a booking, it will appear here.
+                        {statusFilter === "ALL"
+                          ? "No appointments found yet. When you complete a booking, it will appear here."
+                          : `No ${statusFilter.toLowerCase()} appointments found.`}
                       </div>
                     )}
 
-                    {appointments.map((appointment) => {
+                    {visibleAppointments.map((appointment) => {
                       const timezone = "Africa/Lagos";
                       const badge = STATUS_STYLES[appointment.status] ?? {
                         label: appointment.status,
@@ -359,9 +407,15 @@ export default function PatientPortalPage() {
                           <p className="mt-1 text-sm text-slate-700">
                             Consultation: {appointment.consultationType?.name || "Not available"}
                           </p>
+                          {appointment.referenceNumber && (
+                            <p className="mt-1 font-mono text-xs text-slate-500">
+                              Ref: {appointment.referenceNumber}
+                            </p>
+                          )}
                           <p className="mt-1 text-sm text-slate-700">
                             Payment: {appointment.payment?.status || "Not paid"}
                             {appointment.payment?.amount ? ` (${formatCurrency(appointment.payment.amount)})` : ""}
+                            {appointment.payment?.reference ? ` · Ref: ${appointment.payment.reference}` : ""}
                           </p>
 
                           {badge.hint && appointment.status === "PENDING" && (
@@ -459,6 +513,9 @@ export default function PatientPortalPage() {
                         </div>
                         <p className="mt-3 text-sm text-slate-700">Doctor: {payment.doctorName}</p>
                         <p className="mt-1 text-sm text-slate-700">Amount: {formatCurrency(payment.amount)}</p>
+                        {payment.reference && (
+                          <p className="mt-1 font-mono text-xs text-slate-500">Ref: {payment.reference}</p>
+                        )}
                       </article>
                     ))}
                   </div>

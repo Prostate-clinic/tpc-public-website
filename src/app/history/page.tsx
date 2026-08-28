@@ -7,13 +7,14 @@ import PasswordInput from "@/components/PasswordInput";
 
 type HistoryAppointment = {
   id: string;
+  referenceNumber?: string;
   date: string;
   startTime: string;
   endTime: string;
   status: string;
   doctor?: { id: string; name: string };
   service?: { id: string; name: string };
-  payment?: { id: string; status: string; amount: string };
+  payment?: { id: string; status: string; amount: string; reference?: string | null };
 };
 
 type PatientHistoryResponse = {
@@ -144,9 +145,13 @@ export default function HistoryPage() {
                   </p>
                   <p className="mt-1 text-sm text-slate-700">Doctor: {appointment.doctor?.name || "Not assigned"}</p>
                   <p className="mt-1 text-sm text-slate-700">Service: {appointment.service?.name || "Not available"}</p>
+                  {appointment.referenceNumber && (
+                    <p className="mt-1 font-mono text-xs text-slate-500">Ref: {appointment.referenceNumber}</p>
+                  )}
                   <p className="mt-1 text-sm text-slate-700">
                     Payment: {appointment.payment?.status || "N/A"}
                     {appointment.payment?.amount ? ` (${appointment.payment.amount})` : ""}
+                    {appointment.payment?.reference ? ` · Ref: ${appointment.payment.reference}` : ""}
                   </p>
                 </article>
               ))}
