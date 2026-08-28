@@ -45,10 +45,8 @@ export default function ContactPage() {
           <Image src="/robots-img.png" alt="Contact hero" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-slate-900/55" />
           <div className="relative mx-auto max-w-6xl text-center">
-            <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl font-[family-name:var(--font-poppins)]">
-              Get in Touch With The
-              <br />
-              Imo Robotic Surgery and Oncology Center
+            <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl font-[family-name:var(--font-poppins)]">
+              Get in Touch With Us
             </h1>
             <p className="mx-auto mt-6 max-w-2xl leading-7 text-slate-200">
               Whether you have questions about treatment, need support, or want to schedule an appointment, our team is here to help.

@@ -238,9 +238,7 @@ export default function BlogPage() {
           <div className="absolute inset-0 bg-slate-900/55" />
           <div className="relative mx-auto max-w-6xl text-center">
             <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
-              Stay up to date with the latest
-              <br />
-              from The Imo Robotic Surgery and Oncology Center
+              Stay up to date
             </h1>
             <p className="mx-auto mt-6 max-w-2xl leading-7 text-slate-200">
               Explore expert articles, surgical milestones, and practical updates on prostate health, kidney care, and advanced treatment options.

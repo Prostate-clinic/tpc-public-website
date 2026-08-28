@@ -102,6 +102,20 @@ function formatCurrency(amount?: string | number) {
   }).format(numericValue);
 }
 
+function getPwChecks(pw: string) {
+  return {
+    length: pw.length >= 8,
+    upper: /[A-Z]/.test(pw),
+    lower: /[a-z]/.test(pw),
+    number: /\d/.test(pw),
+    special: /[@$!%*?&._-]/.test(pw),
+  };
+}
+function isStrongPw(pw: string) {
+  const c = getPwChecks(pw);
+  return c.length && c.upper && c.lower && c.number && c.special;
+}
+
 export default function PatientPortalPage() {
   const { patient, token, logout } = usePatientAuth();
   const router = useRouter();
@@ -111,7 +125,9 @@ export default function PatientPortalPage() {
       ? "book"
       : searchParams.get("section") === "payments"
         ? "payments"
-        : "history";
+        : searchParams.get("section") === "profile"
+          ? "profile"
+          : "history";
 
   const [appointments, setAppointments] = useState<PortalAppointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,6 +139,14 @@ export default function PatientPortalPage() {
   const [cancelReason, setCancelReason] = useState("");
   const [cancelBusy, setCancelBusy] = useState(false);
   const [cancelError, setCancelError] = useState("");
+
+  const [curPw, setCurPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [showPw, setShowPw] = useState(false);
 
   const paymentEntries = useMemo(() => {
     return appointments
@@ -233,6 +257,27 @@ export default function PatientPortalPage() {
     router.push("/");
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError(""); setPwSuccess("");
+    if (!isStrongPw(newPw)) { setPwError("Password must be at least 8 characters and include uppercase, lowercase, number and special character."); return; }
+    if (newPw !== confirmPw) { setPwError("Passwords do not match."); return; }
+    if (curPw === newPw) { setPwError("New password must be different from current."); return; }
+    setPwLoading(true);
+    try {
+      const res = await fetch("/api/patients/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword: curPw, newPassword: newPw }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to change password");
+      setPwSuccess(data.message || "Password changed successfully.");
+      setCurPw(""); setNewPw(""); setConfirmPw("");
+    } catch (err) { setPwError(err instanceof Error ? err.message : "Failed"); }
+    finally { setPwLoading(false); }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header />
@@ -279,6 +324,7 @@ export default function PatientPortalPage() {
                   { id: "history", href: "/patient-portal?section=history", label: "Appointment History" },
                   { id: "payments", href: "/patient-portal?section=payments", label: "Payment History" },
                   { id: "book", href: "/patient-portal?section=book", label: "Book Appointment" },
+                  { id: "profile", href: "/patient-portal?section=profile", label: "Profile & Security" },
                 ].map((item) => (
                   <Link
                     key={item.id}
@@ -324,14 +370,16 @@ export default function PatientPortalPage() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
-                      {section === "payments" ? "Payments" : section === "book" ? "Booking" : "Appointments"}
+                      {section === "payments" ? "Payments" : section === "book" ? "Booking" : section === "profile" ? "Profile" : "Appointments"}
                     </p>
                     <h2 className="mt-3 text-2xl font-semibold text-slate-900">
                       {section === "payments"
                         ? "Your payment history"
                         : section === "book"
                           ? "Continue to appointment booking"
-                          : "Your appointment history"}
+                          : section === "profile"
+                            ? "Profile & Security"
+                            : "Your appointment history"}
                     </h2>
                   </div>
                   {loading && (
@@ -533,6 +581,63 @@ export default function PatientPortalPage() {
                     >
                       Open Booking Flow
                     </Link>
+                  </div>
+                )}
+
+                {section === "profile" && (
+                  <div className="mt-6 space-y-6">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                      <p className="text-sm font-semibold text-slate-900">{patient?.name}</p>
+                      <p className="mt-1 text-sm text-slate-600">{patient?.email}</p>
+                      <p className="mt-1 text-xs text-slate-500">{patient?.phone || "Phone not provided"} • {patient?.emailVerified ? "Email verified" : "Email not verified"}</p>
+                    </div>
+
+                    <form onSubmit={handleChangePassword} className="rounded-2xl border border-slate-200 bg-white p-5">
+                      <h3 className="text-base font-semibold text-slate-900">Change Password</h3>
+                      <p className="mt-1 text-xs text-slate-500">Use a strong password with at least 8 characters, including uppercase, lowercase, number and special character.</p>
+
+                      {pwError && <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{pwError}</div>}
+                      {pwSuccess && <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{pwSuccess}</div>}
+
+                      <div className="mt-4 space-y-4">
+                        <div>
+                          <label className="mb-1 block text-sm font-medium text-slate-700">Current password</label>
+                          <div className="relative">
+                            <input type={showPw ? "text" : "password"} value={curPw} onChange={(e) => setCurPw(e.target.value)} required className="w-full rounded-lg border border-slate-300 px-3 py-2.5 pr-16 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Current password" />
+                            <button type="button" onClick={() => setShowPw(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-600">{showPw ? "Hide" : "Show"}</button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-sm font-medium text-slate-700">New password</label>
+                          <input type={showPw ? "text" : "password"} value={newPw} onChange={(e) => setNewPw(e.target.value)} required placeholder="At least 8 characters" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                          <div className="mt-2 grid grid-cols-2 gap-1.5">
+                            {[
+                              { ok: getPwChecks(newPw).length, label: "8+ characters" },
+                              { ok: getPwChecks(newPw).upper, label: "Uppercase" },
+                              { ok: getPwChecks(newPw).lower, label: "Lowercase" },
+                              { ok: getPwChecks(newPw).number, label: "Number" },
+                              { ok: getPwChecks(newPw).special, label: "Special char" },
+                            ].map(c => (
+                              <span key={c.label} className={`flex items-center gap-1 text-xs ${c.ok ? "text-emerald-600" : "text-slate-400"}`}>
+                                <span className={`flex h-3 w-3 items-center justify-center rounded-full text-[10px] ${c.ok ? "bg-emerald-100" : "bg-slate-100"}`}>{c.ok ? "✓" : "×"}</span> {c.label}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-sm font-medium text-slate-700">Confirm new password</label>
+                          <input type={showPw ? "text" : "password"} value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} required placeholder="Repeat new password" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                          {confirmPw && <p className={`mt-1 text-xs ${newPw === confirmPw ? "text-emerald-600" : "text-red-600"}`}>{newPw === confirmPw ? "Passwords match" : "Passwords do not match"}</p>}
+                        </div>
+                        <button type="submit" disabled={pwLoading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1a1aaa] py-3 text-sm font-semibold text-white hover:bg-indigo-800 disabled:opacity-60">
+                          {pwLoading ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" /> Updating...</> : "Update password"}
+                        </button>
+                      </div>
+                    </form>
+
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center text-xs text-slate-500">
+                      More profile settings (contact details, preferences) can be added here later.
+                    </div>
                   </div>
                 )}
               </article>

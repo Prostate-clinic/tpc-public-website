@@ -85,6 +85,10 @@ function LoginPageInner() {
                             />
                         </div>
 
+                        <div className="flex justify-end">
+                            <Link href="/forgot-password" className="text-xs font-medium text-indigo-700 hover:underline">Forgot password?</Link>
+                        </div>
+
                         {error && (
                             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
                         )}

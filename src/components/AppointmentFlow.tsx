@@ -248,8 +248,42 @@ function AppointmentFlowInner() {
 
     const isAuthenticated = Boolean(patient && token);
 
-    const contactValid =
-        contactName.trim().length > 1 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail.trim());
+    function validateFullName(value: string): string | null {
+        const trimmed = value.trim();
+        if (!trimmed) return "Full name is required.";
+        const parts = trimmed.split(/\s+/).filter(Boolean);
+        if (parts.length < 2) return "Please enter your full name (first and last name).";
+        if (trimmed.length < 3) return "Full name is too short.";
+        // Industry standard: letters (including accented), spaces, hyphens, apostrophes only; at least two names
+        const fullRe = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '\-][A-Za-zÀ-ÖØ-öø-ÿ]+)+$/;
+        if (!fullRe.test(trimmed)) return "Use only letters, spaces, hyphens or apostrophes (at least two names).";
+        for (const p of parts) {
+            if (p.length < 2) return "Each name must be at least 2 characters.";
+            if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\-]+$/.test(p)) return "Name contains invalid characters.";
+        }
+        return null;
+    }
+
+    function validateEmail(value: string): string | null {
+        const trimmed = value.trim();
+        if (!trimmed) return "Email is required.";
+        if (trimmed.length > 254) return "Email is too long.";
+        if (trimmed.includes("..")) return "Email cannot contain consecutive dots.";
+        const [local] = trimmed.split("@");
+        if (local.length > 64) return "Email local part is too long.";
+        // Industry-standard simplified RFC 5322
+        const emailRe = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[A-Za-z]{2,}$/;
+        if (!emailRe.test(trimmed)) return "Please enter a valid email address (e.g. name@example.com).";
+        return null;
+    }
+
+    const [nameTouched, setNameTouched] = useState(false);
+    const [emailTouched, setEmailTouched] = useState(false);
+
+    const nameError = useMemo(() => validateFullName(contactName), [contactName]);
+    const emailError = useMemo(() => validateEmail(contactEmail), [contactEmail]);
+
+    const contactValid = !nameError && !emailError;
 
     const canContinue = useMemo(() => {
         if (currentStep === 1) return contactValid && Boolean(selectedConsultation);
@@ -498,6 +532,11 @@ function AppointmentFlowInner() {
     };
 
     const moveNext = () => {
+        if (currentStep === 1 && !contactValid) {
+            setNameTouched(true);
+            setEmailTouched(true);
+            return;
+        }
         if (!canContinue || currentStep >= 3) return;
         setCurrentStep((prev) => {
             const next = prev + 1;
@@ -513,7 +552,11 @@ function AppointmentFlowInner() {
 
     const confirmBooking = async () => {
         if (!selectedConsultation || !selectedSlot || isSubmitting) return;
-        if (!contactValid) return;
+        if (!contactValid) {
+            setNameTouched(true);
+            setEmailTouched(true);
+            return;
+        }
 
         setIsSubmitting(true);
         setSubmitError("");
@@ -671,25 +714,34 @@ function AppointmentFlowInner() {
 
                                         <div className="mt-3 grid gap-3 sm:grid-cols-2">
                                             <label className="grid gap-1 text-sm sm:col-span-2">
-                                                <span className="font-semibold text-slate-700">Full name</span>
+                                                <span className="font-semibold text-slate-700">Full name <span className="text-red-500">*</span></span>
                                                 <input
                                                     value={contactName}
                                                     onChange={(event) => setContactName(event.target.value)}
+                                                    onBlur={() => setNameTouched(true)}
                                                     required
-                                                    className="h-11 rounded-xl border border-slate-300 bg-white px-3 outline-none ring-indigo-300 focus:ring"
+                                                    autoComplete="name"
+                                                    aria-invalid={nameTouched && !!nameError}
+                                                    className={`h-11 rounded-xl border bg-white px-3 outline-none focus:ring ${nameTouched && nameError ? "border-red-300 focus:ring-red-200" : "border-slate-300 ring-indigo-300 focus:ring"}`}
                                                     placeholder="Ada Obi"
                                                 />
+                                                {nameTouched && nameError && <span className="text-xs font-medium text-red-600">{nameError}</span>}
                                             </label>
                                             <label className="grid gap-1 text-sm">
-                                                <span className="font-semibold text-slate-700">Email</span>
+                                                <span className="font-semibold text-slate-700">Email <span className="text-red-500">*</span></span>
                                                 <input
                                                     value={contactEmail}
                                                     onChange={(event) => setContactEmail(event.target.value)}
+                                                    onBlur={() => setEmailTouched(true)}
                                                     type="email"
                                                     required
-                                                    className="h-11 rounded-xl border border-slate-300 bg-white px-3 outline-none ring-indigo-300 focus:ring"
+                                                    autoComplete="email"
+                                                    inputMode="email"
+                                                    aria-invalid={emailTouched && !!emailError}
+                                                    className={`h-11 rounded-xl border bg-white px-3 outline-none focus:ring ${emailTouched && emailError ? "border-red-300 focus:ring-red-200" : "border-slate-300 ring-indigo-300 focus:ring"}`}
                                                     placeholder="name@email.com"
                                                 />
+                                                {emailTouched && emailError && <span className="text-xs font-medium text-red-600">{emailError}</span>}
                                             </label>
                                             <label className="grid gap-1 text-sm">
                                                 <span className="font-semibold text-slate-700">Phone (optional)</span>
@@ -1103,8 +1155,9 @@ function AppointmentFlowInner() {
                                     <button
                                         type="button"
                                         onClick={moveNext}
-                                        disabled={!canContinue}
-                                        className="rounded-full bg-[#1a1aaa] px-6 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                        disabled={Boolean(booked) || currentStep >= 3}
+                                        className={`rounded-full bg-[#1a1aaa] px-6 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 ${!canContinue ? "opacity-40" : ""}`}
+                                        aria-disabled={!canContinue}
                                     >
                                         Continue
                                     </button>

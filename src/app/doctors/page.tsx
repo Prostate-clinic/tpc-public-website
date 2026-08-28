@@ -111,7 +111,7 @@ export default function DoctorsPage() {
           />
           <div className="absolute inset-0 bg-slate-900/50" />
           <div className="relative mx-auto max-w-6xl text-center">
-            <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl font-[family-name:var(--font-poppins)]">
+            <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl font-[family-name:var(--font-poppins)]">
                 Specialist Expertise,
               <br />
                 Compassionate Precision,
