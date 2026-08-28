@@ -141,7 +141,7 @@ export default function Services() {
           <div className="absolute inset-0 bg-slate-900/70" />
           <div className="absolute mx-auto max-w-6xl left-0 right-0 top-1/2 -translate-y-1/9 px-5">
             <div className="mt-28 mx-auto max-w-3xl rounded-4xl border border-white/20 bg-white/95 backdrop-blur-md p-8 text-center shadow-2xl md:p-10">
-              <h2 className="text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
+              <h2 className="text-3xl font-bold leading-tight text-slate-900 md:text-4xl font-[family-name:var(--font-poppins)]">
                 Precision Urology.
                 <br />
                 <span className="text-[#f04438]">Advanced Clinical Excellence.</span>
@@ -159,7 +159,7 @@ export default function Services() {
         </section>
 
         <section className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-40">
-          <h2 className="mt-3 text-center text-4xl font-bold sm:text-5xl">Explore Our Services</h2>
+          <h2 className="mt-3 text-center text-4xl font-bold sm:text-5xl font-[family-name:var(--font-poppins)]">Explore Our Services</h2>
           <p className="mx-auto mt-4 max-w-2xl text-center leading-7 text-slate-600">
             Choose a pathway to view focused clinical services. Each service card outlines how technology and specialists work together.
           </p>
@@ -244,7 +244,7 @@ export default function Services() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <h2 className="text-4xl font-bold sm:text-5xl">Why Choose Us</h2>
+          <h2 className="text-4xl font-bold sm:text-5xl font-[family-name:var(--font-poppins)]">Why Choose Us</h2>
           <p className="mb-12 mt-4 max-w-2xl leading-7 text-slate-600">
             Clinical excellence is built through specialist depth, integrated technology, and consistent care pathways.
           </p>

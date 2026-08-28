@@ -34,7 +34,6 @@ export function GlobalFooter({ id }: GlobalFooterProps) {
         <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-[0_10px_35px_-22px_rgba(15,23,42,0.35)] backdrop-blur-md sm:p-8">
           <div className="grid gap-5 md:grid-cols-[1.15fr_0.85fr] md:items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-700">Stay Informed</p>
               <h2 className="mt-3 text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
                 Receive trusted recovery guidance and clinic updates.
               </h2>
@@ -50,7 +49,7 @@ export function GlobalFooter({ id }: GlobalFooterProps) {
                 aria-label="Email address"
                 className="h-12 w-full rounded-full border border-slate-300 bg-white px-5 text-sm text-slate-900 placeholder:text-slate-500 outline-none ring-cyan-400/40 focus:ring"
               />
-              <button className="h-12 shrink-0 rounded-full bg-cyan-600 px-7 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-cyan-500">
+              <button className="h-12 shrink-0 rounded-full bg-primary px-7 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-cyan-500">
                 Subscribe
               </button>
             </form>

@@ -195,7 +195,6 @@ export default function About() {
                     <Image src="/hero-robots.jpg" alt="About hero" fill className="object-cover" priority />
                     <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-[2px]" />
                     <div className="relative mx-auto max-w-6xl text-center">
-                        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">About Imo Robotic Surgery and Oncology Center</p>
                         <h1 className="mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl">
                             Redefining Specialized Care
                             <br />

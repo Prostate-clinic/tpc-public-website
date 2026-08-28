@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { GlobalFooter } from "@/components/GlobalFooter";
 import { RecoveryCta } from "@/components/RecoveryCta";
+import { Check } from "lucide-react";
 
 const DOCTOR_FALLBACK_IMAGE = "/No-Image-Placeholder%20(2).svg";
 const SIRV_BASE_URL = "https://s3.sirv.com";
@@ -100,7 +101,7 @@ export default function DoctorsPage() {
       <Header />
 
       <main>
-        <section className="relative isolate overflow-hidden px-5 pb-20 pt-14 sm:px-6 md:pb-24 lg:px-8 h-[70vh]">
+        <section className="relative isolate overflow-hidden px-5 pb-24 pt-14 sm:px-6 md:pb-28 lg:px-8">
           <Image
             src="/robots-img.png"
             alt="Doctors care background"
@@ -110,7 +111,7 @@ export default function DoctorsPage() {
           />
           <div className="absolute inset-0 bg-slate-900/50" />
           <div className="relative mx-auto max-w-6xl text-center">
-            <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
+            <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl font-[family-name:var(--font-poppins)]">
                 Specialist Expertise,
               <br />
                 Compassionate Precision,
@@ -128,7 +129,7 @@ export default function DoctorsPage() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
-          <h2 className="text-center text-5xl font-bold tracking-tight">Our team</h2>
+          <h2 className="text-center text-5xl font-bold tracking-tight font-[family-name:var(--font-poppins)]">Our team</h2>
           <p className="mt-3 text-center text-slate-600">Meet Our Specialists</p>
 
           {loading && (
@@ -160,8 +161,8 @@ export default function DoctorsPage() {
                   <div className="flex items-center justify-center gap-2">
                     <h3 className="text-2xl font-bold">{doctor.name || doctor.user?.name || "Specialist"}</h3>
                     {doctor.status && (
-                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${doctor.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
-                        {doctor.status}
+                      <span className={`rounded-full px-0.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide ${doctor.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+                        {doctor.status.toLowerCase() === "active" && <Check size={10}/>}
                       </span>
                     )}
                   </div>
@@ -170,13 +171,13 @@ export default function DoctorsPage() {
                     {doctor.bio || "Experienced specialist delivering evidence-based urologic care with a patient-first approach."}
                   </p>
 
-                  <p className="mt-4 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {/* <p className="mt-4 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                     {formatAvailability(doctor.slots)}
-                  </p>
+                  </p> */}
 
-                  <button className="mt-6 w-full rounded-full bg-[#1a1aaa] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#111188]">
+                  {/* <button className="mt-6 w-full rounded-full bg-[#1a1aaa] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#111188]">
                     View profile
-                  </button>
+                  </button> */}
                 </div>
               </article>
             ))}

@@ -144,7 +144,7 @@ export function Header() {
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/services", label: "Services" },
-    { href: "/doctors", label: "Doctors" },
+    { href: "/doctors", label: "Our Team" },
     { href: "/contact", label: "Contact" },
     { href: "/blog", label: "Blog" },
   ];

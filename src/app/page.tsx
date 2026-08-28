@@ -6,6 +6,8 @@ import { PaymentVerificationPopup } from "@/components/PaymentVerificationPopup"
 import { buildBackendUrl } from "@/lib/backend-api";
 import { BlogPost } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 
 type insight = {
   id: string,
@@ -42,8 +44,10 @@ const services = [
 ];
 
 const partners = [
-  { name: "Partner 1", logo: "/partners/idcl.png" },
-  { name: "Partner 2", logo: "/partners/imogov.png" },
+  { name: "Imo Digital City Ltd", logo: "/partners/idcl.png" },
+  { name: "Imo State Government", logo: "/partners/imogov.png" },
+  { name: "Imo State Health Insurance Agency", logo: "/partners/IMSHIA.png"},
+  { name: "Heartland Hospital Management Board", logo: "/partners/heartland.png"}
 ];
 
 async function fetchBlogs() {
@@ -93,7 +97,7 @@ export default async function Home() {
           <div className="absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]" />
           <div className="relative mx-auto flex min-h-[68vh] w-full max-w-6xl items-center justify-center">
             <div className="text-center">
-              <h1 className="mx-auto max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-5xl">
+              <h1 className="mx-auto max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-5xl font-[family-name:var(--font-poppins)]">
                 Advanced Prostate & Urological Care Powered by AI and Robotics
               </h1>
               <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-slate-200 sm:text-lg">
@@ -122,7 +126,7 @@ export default async function Home() {
         <section id="about" className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-14 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.17em] text-[var(--primary)]">Who We Are</p>
-            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">A New Standard in AI-Integrated Urology</h2>
+            <h2 className="mt-3 text-3xl font-bold sm:text-4xl font-[family-name:var(--font-poppins)]">A New Standard in AI-Integrated Urology</h2>
             <p className="mt-5 leading-7 text-slate-600">
               Imo Robotic Surgery and Oncology Center is a specialist medical institution focused on technology-enhanced prostate and urological
               care. We combine expert clinicians with robotics, clinical data intelligence, and continuous monitoring systems.
@@ -156,7 +160,7 @@ export default async function Home() {
         </section>
 
         <section id="services" className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl">Explore Our Services</h2>
+            <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl font-[family-name:var(--font-poppins)]">Explore Our Services</h2>
           <p className="text-center text-[11px] mt-3 font-semibold uppercase tracking-[0.2em] text-slate-500">Advanced specialized services with cutting edge technology</p>
 
           <div className="relative mt-12 space-y-20">
@@ -213,7 +217,7 @@ export default async function Home() {
             </div>
 
             <div className="flex justify-center">
-              <Link href="/services" className="rounded-full bg-[var(--primary)] px-5 py-1.5 font-semibold uppercase tracking-[0.08em] text-white">
+              <Link href="/services" className="rounded-full bg-[var(--primary)] px-5 py-1.5 font-semibold tracking-normal text-white">
                 See all
               </Link>
             </div>
@@ -222,11 +226,11 @@ export default async function Home() {
 
         <section className="bg-slate-100">
           <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
-            <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl">Meet our Partners</h2>
+            <h2 className="text-center text-3xl font-bold text-slate-900 sm:text-4xl font-[family-name:var(--font-poppins)]">Meet our Partners</h2>
             <p className="text-center text-[11px] mt-3 font-semibold uppercase tracking-[0.2em] text-slate-500">Trusted organizations we work with</p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-10 sm:gap-14">
               {partners.map((partner) => (
-                <div key={partner.name} className="flex h-28 w-44 items-center justify-center rounded-xl px-6 py-4 shadow-sm">
+                <div key={partner.name} className="flex h-28 w-44 items-center justify-center rounded-xl px-6 py-4 shadow-sm bg-white">
                   <Image
                     src={partner.logo}
                     alt={partner.name}
@@ -241,7 +245,7 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold sm:text-4xl">Patient Testimonials</h2>
+          <h2 className="text-center text-3xl font-bold sm:text-4xl font-[family-name:var(--font-poppins)]">Patient Testimonials</h2>
           <p className="mt-3 text-center text-slate-600">Real experiences from people who trusted Imo Robotic Surgery and Oncology Center.</p>
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {[
@@ -260,7 +264,7 @@ export default async function Home() {
 
         <section id="insights" className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
           <p className="text-center text-sm font-semibold uppercase tracking-[0.17em] text-[var(--primary)]">Latest Articles</p>
-          <h2 className="mt-3 text-center text-3xl font-bold sm:text-4xl">Recent Blog Posts</h2>
+          <h2 className="mt-3 text-center text-3xl font-bold sm:text-4xl font-[family-name:var(--font-poppins)]">Recent Blog Posts</h2>
           {insights.length === 0 ? (
             <div className="mt-10 text-center text-slate-600">
               <p>No blog posts available at the moment. Check back soon!</p>
