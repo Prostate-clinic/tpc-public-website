@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 function getChecks(pw: string) {
   return {
@@ -44,9 +45,10 @@ function OtpInput({ value, onChange }: { value: string; onChange: (v: string) =>
   );
 }
 
-export default function PatientForgotPasswordPage() {
+function PatientForgotPasswordPageInner() {
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<"email" | "otp">("email");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -176,5 +178,19 @@ export default function PatientForgotPasswordPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function PatientForgotPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        </div>
+      }
+    >
+      <PatientForgotPasswordPageInner />
+    </Suspense>
   );
 }
