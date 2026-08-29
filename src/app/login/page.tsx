@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
 import PasswordInput from "@/components/PasswordInput";
+import { AuthLayout } from "@/components/AuthLayout";
 
 function LoginPageInner() {
     const router = useRouter();
@@ -46,74 +47,72 @@ function LoginPageInner() {
     };
 
     return (
-        <main className="min-h-screen bg-gray-50 pb-20 pt-12">
-            <div className="mx-auto max-w-lg px-4">
-                <Link href="/" className="mb-8 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-700">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Back to home
-                </Link>
-
-                <div className="rounded-2xl bg-white px-8 py-8 shadow-sm">
-                    <div className="mb-6 text-center">
-                        <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-                        <p className="mt-1 text-sm text-gray-500">Sign in to your patient account</p>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
-                            <PasswordInput
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter your password"
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                            />
-                        </div>
-
-                        <div className="flex justify-end">
-                            <Link href="/forgot-password" className="text-xs font-medium text-indigo-700 hover:underline">Forgot password?</Link>
-                        </div>
-
-                        {error && (
-                            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1a1aaa] py-3 text-sm font-semibold text-white transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            {loading && (
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
-                            )}
-                            {loading ? "Signing in..." : "Sign In"}
-                        </button>
-                    </form>
-
-                    <p className="mt-5 text-center text-sm text-gray-500">
-                        Don&apos;t have an account?{" "}
-                        <Link href="/register" className="font-semibold text-indigo-700 hover:underline">
-                            Create one
-                        </Link>
-                    </p>
+        <AuthLayout
+            title="Welcome Back"
+            subtitle="Sign in to your patient account to manage appointments and payments."
+            icon={
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            }
+            footer={
+                <>
+                    Don&apos;t have an account?{" "}
+                    <Link href="/register" className="font-semibold text-white underline underline-offset-2">
+                        Create one
+                    </Link>
+                </>
+            }
+        >
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition focus:border-[#1a1aaa] focus:outline-none focus:ring-2 focus:ring-[#1a1aaa]/20"
+                    />
                 </div>
-            </div>
-        </main>
+
+                <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
+                    <PasswordInput
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition focus:border-[#1a1aaa] focus:outline-none focus:ring-2 focus:ring-[#1a1aaa]/20"
+                    />
+                </div>
+
+                {error && (
+                    <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex w-full items-center justify-center gap-2 rounded-md bg-[#1a1aaa] py-3 text-sm font-semibold text-white transition hover:bg-[#111188] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {loading && (
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
+                    )}
+                    {loading ? "Signing in..." : "Sign In"}
+                </button>
+
+                <div className="pt-1 text-center">
+                    <Link
+                        href={`/forgot-password${email.trim() ? `?email=${encodeURIComponent(email.trim())}` : ""}`}
+                        className="text-sm font-medium text-[#1a1aaa] hover:underline"
+                    >
+                        Forgot password?
+                    </Link>
+                </div>
+            </form>
+        </AuthLayout>
     );
 }
 
@@ -121,8 +120,8 @@ export default function LoginPage() {
     return (
         <Suspense
             fallback={
-                <div className="flex min-h-screen items-center justify-center bg-gray-50">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+                <div className="flex min-h-screen items-center justify-center bg-[#0b0f3a]">
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1a1aaa] border-t-transparent" />
                 </div>
             }
         >

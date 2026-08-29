@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePatientAuth } from "@/contexts/PatientAuthContext";
 import PasswordInput from "@/components/PasswordInput";
+import { AuthLayout } from "@/components/AuthLayout";
 
 type Step = "register" | "verify" | "done";
 
@@ -165,34 +166,47 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-20 pt-12">
-      <div className="mx-auto max-w-lg px-4">
-        {/* Back link */}
-        <Link href="/" className="mb-8 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-700">
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to home
-        </Link>
-
-        <div className="rounded-2xl bg-white px-8 py-8 shadow-sm">
-          {/* Logo / brand */}
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-gray-900">Create Patient Account</h1>
-            <p className="mt-1 text-sm text-gray-500">Imo Robotic Surgery and Oncology Center Patient Portal</p>
-          </div>
-
-          {/* Step indicator */}
-          <div className="mb-8 flex items-center justify-center gap-3">
-            {(["register", "verify", "done"] as Step[]).map((s, i) => (
-              <div key={s} className="flex items-center gap-3">
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${step === s ? "bg-[#1a1aaa] text-white" : i < ["register", "verify", "done"].indexOf(step) ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"}`}>
-                  {i < ["register", "verify", "done"].indexOf(step) ? "✓" : i + 1}
-                </div>
-                {i < 2 && <div className="h-px w-8 bg-gray-200" />}
+    <AuthLayout
+      title={step === "done" ? "Account Created!" : "Create Account"}
+      subtitle={
+        step === "register"
+          ? "Join the Imo Robotic Surgery and Oncology Center patient portal."
+          : step === "verify"
+            ? "Verify your email to activate your account."
+            : "Your email has been verified. Welcome aboard."
+      }
+      icon={
+        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 9h18M9 4v5" />
+        </svg>
+      }
+      footer={
+        step === "register" ? (
+          <>
+            Already have an account?{" "}
+            <Link href="/login" className="font-semibold text-white underline underline-offset-2">
+              Sign in
+            </Link>
+          </>
+        ) : (
+          <></>
+        )
+      }
+    >
+      {/* Step indicator */}
+      {/* {step !== "done" && (
+        <div className="mb-8 flex items-center justify-center gap-3">
+          {(["register", "verify"] as Step[]).map((s, i) => (
+            <div key={s} className="flex items-center gap-3">
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${step === s ? "bg-[#1a1aaa] text-white" : i < ["register", "verify"].indexOf(step) ? "bg-emerald-500 text-white" : "bg-gray-200 text-gray-500"}`}>
+                {i < ["register", "verify"].indexOf(step) ? "✓" : i + 1}
               </div>
-            ))}
-          </div>
+              {i < 1 && <div className="h-px w-8 bg-gray-200" />}
+            </div>
+          ))}
+        </div>
+      )} */}
 
           {/* ── Step 1: Registration form ── */}
           {step === "register" && (
@@ -390,46 +404,30 @@ export default function RegisterPage() {
           {/* ── Step 3: Done ── */}
           {step === "done" && (
             <div className="py-4 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+                <svg className="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Account Created!</h2>
               <p className="mt-2 text-sm text-gray-500">
                 Your email has been verified. You&apos;re now logged in to the patient portal.
               </p>
               <div className="mt-6 flex flex-col gap-3">
                 <button
                   onClick={() => router.push("/appointment")}
-                  className="w-full rounded-lg bg-[#1a1aaa] py-3 text-sm font-semibold text-white transition hover:bg-indigo-800"
+                  className="w-full rounded-md bg-[#1a1aaa] py-3 text-sm font-semibold text-white transition hover:bg-[#111188]"
                 >
                   Book an Appointment
                 </button>
                 <button
                   onClick={() => router.push("/")}
-                  className="w-full rounded-lg border border-gray-200 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="w-full rounded-md border border-gray-300 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
                 >
                   Go to Home
                 </button>
               </div>
             </div>
           )}
-
-          {step === "register" && (
-            <p className="mt-5 text-center text-sm text-gray-500">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => router.push("/login")}
-                className="font-semibold text-indigo-700 hover:underline"
-              >
-                Sign in
-              </button>
-            </p>
-          )}
-        </div>
-      </div>
-    </main>
+    </AuthLayout>
   );
 }

@@ -292,7 +292,7 @@ export default function PatientPortalPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/?signin=1"
+                href="/login"
                 className="rounded-full bg-[#1a1aaa] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#111188]"
               >
                 Sign in
