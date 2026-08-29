@@ -18,7 +18,7 @@ export function AuthLayout({ title, subtitle, icon, children, footer }: AuthLayo
       {/* Robot background image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/robots-img.png')" }}
+        style={{ backgroundImage: "url('/robots-img.png')", backgroundAttachment:"fixed" }}
         aria-hidden="true"
       />
 
