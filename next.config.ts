@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
+// Server-side only — used by rewrites() as a fallback proxy so the backend
+// URL never reaches the browser.
+const BACKEND_API_BASE = process.env.BACKEND_API_URL || "http://localhost:4000/api";
+
 const securityHeaders = [
   {
     key: "X-Frame-Options",
@@ -31,7 +35,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' blob: data: https://res.cloudinary.com https://s3.sirv.com",
       "font-src 'self' data:",
-      "connect-src 'self' http://localhost:4000 https://tpc-backend-xcz5.onrender.com",
+      "connect-src 'self'",
       "frame-src 'self' https://www.google.com https://www.google.com/maps https://maps.google.com",
       "object-src 'none'",
       "base-uri 'self'",
@@ -59,6 +63,14 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${BACKEND_API_BASE}/:path*`,
       },
     ];
   },

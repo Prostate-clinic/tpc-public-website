@@ -4,9 +4,7 @@ const DEFAULT_BACKEND_BASE_URL = "http://localhost:4000/api";
 
 export function getBackendBaseUrl() {
   return (
-    process.env.BACKEND_API_URL ||
-    process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-    DEFAULT_BACKEND_BASE_URL
+    process.env.BACKEND_API_URL || DEFAULT_BACKEND_BASE_URL
   ).replace(/\/$/, "");
 }
 
